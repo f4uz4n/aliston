@@ -63,15 +63,15 @@ class Participant extends BaseController
         $paymentModel = new PaymentModel();
 
         foreach ($participants as &$p) {
-            // Payment Progress
+            // Payment Progress (total = harga paket + upgrade hotel/kamar/bed)
             $paid = $paymentModel->getTotalPaid($p['id']);
             $p['total_paid'] = $paid['amount'] ?? 0;
-            $price = $p['package_price'] ?? 0;
+            $totalTarget = (float)($p['package_price'] ?? 0) + (float)($p['upgrade_cost'] ?? 0);
+            $p['total_target'] = $totalTarget;
 
-            if ($price > 0) {
-                $p['payment_progress'] = min(100, round(($p['total_paid'] / $price) * 100));
-            }
-            else {
+            if ($totalTarget > 0) {
+                $p['payment_progress'] = min(100, round(($p['total_paid'] / $totalTarget) * 100));
+            } else {
                 $p['payment_progress'] = 0;
             }
 

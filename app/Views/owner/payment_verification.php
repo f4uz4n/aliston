@@ -8,16 +8,21 @@
     </div>
 </div>
 
-<!-- Tabs -->
+<?php
+$participant_id_q = !empty($filters['participant_id']) ? 'participant_id=' . (int)$filters['participant_id'] : '';
+$url_pending = base_url('owner/payment-verification') . ($participant_id_q ? '?' . $participant_id_q : '');
+$url_history = base_url('owner/payment-verification?tab=history') . ($participant_id_q ? '&' . $participant_id_q : '');
+?>
+<!-- Tabs: Perlu Verifikasi aktif saat buka dari menu -->
 <div class="mb-4">
     <ul class="nav nav-pills bg-white p-1 rounded-pill shadow-sm d-inline-flex" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
-            <a href="<?= base_url('owner/payment-verification') ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'pending') ? 'active fw-bold' : 'text-secondary' ?>">
+            <a href="<?= $url_pending ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'pending') ? 'active fw-bold' : 'text-secondary' ?>">
                 <i class="bi bi-clock-history me-2"></i> Perlu Verifikasi
             </a>
         </li>
         <li class="nav-item" role="presentation">
-            <a href="<?= base_url('owner/payment-verification?tab=history') ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'history') ? 'active fw-bold' : 'text-secondary' ?>">
+            <a href="<?= $url_history ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'history') ? 'active fw-bold' : 'text-secondary' ?>">
                 <i class="bi bi-archive me-2"></i> Riwayat
             </a>
         </li>
@@ -28,27 +33,38 @@
 <form action="" method="get" class="card border-0 shadow-sm p-3 mb-4 rounded-4 bg-white">
     <input type="hidden" name="tab" value="<?= esc($active_tab) ?>">
     <div class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-0"><i class="bi bi-person text-secondary"></i></span>
+                <select name="participant_id" class="form-select border-0 bg-light">
+                    <option value="">Semua Jamaah</option>
+                    <?php foreach (($participants_list ?? []) as $pj): ?>
+                        <option value="<?= (int)$pj['id'] ?>" <?= (string)($filters['participant_id'] ?? '') === (string)$pj['id'] ? 'selected' : '' ?>><?= esc($pj['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="input-group">
                 <span class="input-group-text bg-light border-0"><i class="bi bi-search text-secondary"></i></span>
                 <input type="text" name="search" class="form-control border-0 bg-light" placeholder="Cari Nama, NIK, Agency, Paket..." value="<?= esc($filters['search']) ?>">
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="input-group">
                 <span class="input-group-text bg-light border-0 text-secondary small">Mulai:</span>
                 <input type="date" name="start_date" class="form-control border-0 bg-light" value="<?= esc($filters['start_date']) ?>">
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="input-group">
                 <span class="input-group-text bg-light border-0 text-secondary small">Sampai:</span>
                 <input type="date" name="end_date" class="form-control border-0 bg-light" value="<?= esc($filters['end_date']) ?>">
             </div>
         </div>
         <div class="col-md-2 d-flex gap-2">
-            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Filter</button>
-            <?php if($filters['search'] || $filters['start_date'] || $filters['end_date']): ?>
+            <button type="submit" class="btn btn-primary flex-grow-1 rounded-pill fw-bold">Filter</button>
+            <?php if($filters['search'] || $filters['start_date'] || $filters['end_date'] || ($filters['participant_id'] ?? '') !== ''): ?>
                 <a href="<?= base_url('owner/payment-verification?tab=' . $active_tab) ?>" class="btn btn-light rounded-pill border" data-bs-toggle="tooltip" title="Reset Filter"><i class="bi bi-x-lg"></i></a>
             <?php endif; ?>
         </div>
@@ -110,7 +126,7 @@
                                 </div>
                                 <div class="mt-2 text-end small">
                                     <span class="text-muted">Total Tagihan:</span>
-                                    <span class="fw-bold text-dark ms-1">Rp <?= number_format($p['package_price'], 0, ',', '.') ?></span>
+                                    <span class="fw-bold text-dark ms-1">Rp <?= number_format($p['total_target'] ?? (($p['package_price'] ?? 0) + ($p['upgrade_cost'] ?? 0)), 0, ',', '.') ?></span>
                                 </div>
                             </td>
                             <td>

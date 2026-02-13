@@ -579,6 +579,12 @@
                                 <span>Cetak Dokumen</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="<?= base_url('owner/rubrik-berita') ?>" class="nav-link <?= strpos(current_url(), 'rubrik-berita') !== false ? 'active' : '' ?>">
+                                <i class="bi bi-newspaper"></i>
+                                <span>Rubrik Berita</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                                     <?php else: ?>

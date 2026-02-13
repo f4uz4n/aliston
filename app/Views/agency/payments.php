@@ -54,7 +54,7 @@
                                 <small class="text-secondary">NIK: <?= esc($p['nik']) ?></small>
                             </td>
                             <td><span class="badge bg-light text-dark fw-normal border"><?= esc($p['package_name']) ?></span></td>
-                            <td class="fw-bold text-dark">Rp <?= number_format((float)$p['price'], 0, ',', '.') ?></td>
+                            <td class="fw-bold text-dark">Rp <?= number_format((float)($p['total_tagihan'] ?? $p['price'] ?? 0), 0, ',', '.') ?></td>
                             <td class="text-success fw-bold">Rp <?= number_format((float)$p['total_paid'], 0, ',', '.') ?></td>
                             <td class="<?= $p['remaining'] > 0 ? 'text-danger' : 'text-success' ?> fw-bold">
                                 Rp <?= number_format((float)$p['remaining'], 0, ',', '.') ?>

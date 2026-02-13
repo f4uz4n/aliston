@@ -69,6 +69,29 @@
                     <small class="text-muted d-block mt-2">Muncul di kop kwitansi & slip komisi</small>
                 </div>
             </div>
+
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+                <div class="card-body p-4">
+                    <h6 class="text-secondary small fw-bold text-uppercase ls-1 mb-3 text-start">Slogan</h6>
+                    <input type="text" name="slogan" class="form-control form-control-lg bg-light border-0 rounded-3" value="<?= esc($user['slogan'] ?? '') ?>" placeholder="Contoh: Perjalanan Aman & Nyaman">
+                    <small class="text-muted d-block mt-2">Tagline perusahaan (opsional)</small>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+                <div class="card-body p-4">
+                    <h6 class="text-secondary small fw-bold text-uppercase ls-1 mb-3 text-start">SK Perijinan</h6>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-1">Nomor SK Perijinan</label>
+                        <input type="text" name="no_sk_perijinan" class="form-control bg-light border-0 rounded-3" value="<?= esc($user['no_sk_perijinan'] ?? '') ?>" placeholder="Contoh: 123/DPPT/2024">
+                    </div>
+                    <div>
+                        <label class="form-label small text-muted mb-1">Tanggal SK Perijinan</label>
+                        <input type="text" name="tanggal_sk_perijinan" class="form-control bg-light border-0 rounded-3" value="<?= esc($user['tanggal_sk_perijinan'] ?? '') ?>" placeholder="Contoh: 15 Januari 2024">
+                    </div>
+                    <small class="text-muted d-block mt-2">Surat keterangan perijinan usaha (opsional)</small>
+                </div>
+            </div>
         </div>
 
         <!-- Details Column -->

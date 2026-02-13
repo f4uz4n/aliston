@@ -36,14 +36,15 @@
                         <th class="ps-4 py-3 border-0 text-secondary small fw-bold text-uppercase">Jamaah</th>
                         <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Paket & NIK</th>
                         <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Status</th>
-                        <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Progress</th>
+                        <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Progress Berkas</th>
+                        <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Progress & Status Pembayaran</th>
                         <th class="py-3 border-0 text-secondary small fw-bold text-uppercase text-end pe-4">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if(empty($participants)): ?>
                         <tr>
-                            <td colspan="5" class="text-center py-5">
+                            <td colspan="6" class="text-center py-5">
                                 <div class="py-4">
                                     <i class="bi bi-people text-muted fs-1 opacity-25 mb-3 d-block"></i>
                                     <p class="text-secondary mb-0">Belum ada jamaah yang terdaftar.</p>
@@ -97,8 +98,30 @@
                                     <div class="progress-bar bg-success" role="progressbar" style="width: <?= $percent ?>%"></div>
                                 </div>
                             </td>
+                            <td>
+                                <div class="mb-1">
+                                    <small class="text-secondary d-block" style="font-size: 0.7rem;">Rp <?= number_format($p['total_paid'] ?? 0, 0, ',', '.') ?> / Rp <?= number_format($p['total_target'] ?? 0, 0, ',', '.') ?></small>
+                                    <div class="progress mt-1" style="height: 6px;">
+                                        <?php $payPercent = $p['progress_pembayaran'] ?? 0; ?>
+                                        <div class="progress-bar <?= ($p['pembayaran_lunas'] ?? false) ? 'bg-success' : 'bg-primary' ?>" role="progressbar" style="width: <?= $payPercent ?>%"></div>
+                                    </div>
+                                </div>
+                                <?php if (!empty($p['pembayaran_lunas'])): ?>
+                                    <span class="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill small mt-1"><i class="bi bi-check-circle me-1"></i> Lunas</span>
+                                <?php else: ?>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1 rounded-pill small mt-1"><i class="bi bi-clock me-1"></i> Belum Lunas</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="pe-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                    <a href="<?= base_url('agency/payment-detail/'.$p['id']) ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Laporan Pembayaran">
+                                        <i class="bi bi-wallet2 me-1"></i> Laporan Pembayaran
+                                    </a>
+                                    <?php if (!empty($p['pembayaran_lunas'])): ?>
+                                        <a href="<?= base_url('agency/receipt/'.$p['id']) ?>" target="_blank" class="btn btn-sm btn-success rounded-pill px-3" title="Cetak Pembayaran Lunas">
+                                            <i class="bi bi-printer-fill me-1"></i> Cetak Pembayaran
+                                        </a>
+                                    <?php endif; ?>
                                     <a href="<?= base_url('agency/registration-form/'.$p['id']) ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                         <i class="bi bi-printer me-1"></i> Cetak Formulir
                                     </a>

@@ -10,6 +10,8 @@ $routes->get('package/(:num)', 'Home::packageDetail/$1');
 $routes->get('agen-mitra', 'Home::agenMitra');
 $routes->get('testimoni-jamaah', 'Home::testimoni');
 $routes->post('testimoni-jamaah/submit', 'Home::submitTestimoni');
+$routes->get('berita', 'Home::berita');
+$routes->get('berita/(:segment)', 'Home::beritaDetail/$1');
 $routes->get('login', 'Auth::login');
 $routes->post('auth/login', 'Auth::attemptLogin');
 $routes->post('auth/refresh-token', 'Auth::refreshToken');
@@ -153,7 +155,19 @@ $routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
         // Print Documents
         $routes->get('print-documents', 'PrintDocuments::index');
         $routes->get('print-documents/leave-letter', 'PrintDocuments::printLeaveLetter');
+        $routes->post('print-documents/leave-letter', 'PrintDocuments::printLeaveLetter');
+        $routes->get('print-documents/recommendation-letter', 'PrintDocuments::printRecommendationLetter');
+        $routes->post('print-documents/recommendation-letter', 'PrintDocuments::printRecommendationLetter');
         $routes->get('print-documents/deposit-receipt', 'PrintDocuments::printDepositReceipt');
+
+        // Rubrik Berita (artikel untuk halaman depan)
+        $routes->get('rubrik-berita', 'RubrikBerita::index');
+        $routes->get('rubrik-berita/create', 'RubrikBerita::create');
+        $routes->post('rubrik-berita/store', 'RubrikBerita::store');
+        $routes->get('rubrik-berita/edit/(:num)', 'RubrikBerita::edit/$1');
+        $routes->post('rubrik-berita/update/(:num)', 'RubrikBerita::update/$1');
+        $routes->get('rubrik-berita/delete/(:num)', 'RubrikBerita::delete/$1');
+        $routes->post('rubrik-berita/toggle-status/(:num)', 'RubrikBerita::toggleStatus/$1');
     });
 
 $routes->group('package', ['filter' => 'auth:owner'], function ($routes) {

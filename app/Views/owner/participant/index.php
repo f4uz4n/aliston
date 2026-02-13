@@ -104,7 +104,7 @@
                                 <td>
                                     <div class="d-flex justify-content-between small fw-bold mb-1">
                                         <span class="text-primary"><?= $part['payment_progress'] ?>%</span>
-                                        <span class="text-secondary small">Rp <?= number_format($part['total_paid'] / 1000000, 1) ?>M <span class="text-muted fw-normal">/ <?= number_format($part['package_price'] / 1000000, 1) ?>M</span></span>
+                                        <span class="text-secondary small">Rp <?= number_format($part['total_paid'] / 1000000, 1) ?>M <span class="text-muted fw-normal">/ <?= number_format(($part['total_target'] ?? $part['package_price']) / 1000000, 1) ?>M</span></span>
                                     </div>
                                     <div class="progress" style="height: 6px;">
                                         <div class="progress-bar <?= ($part['payment_progress'] >= 100) ? 'bg-success' : 'bg-primary' ?>" role="progressbar" style="width: <?= $part['payment_progress'] ?>%" aria-valuenow="<?= $part['payment_progress'] ?>" aria-valuemin="0" aria-valuemax="100"></div>
@@ -127,13 +127,16 @@
                                 </td>
                                 <td class="pe-4 text-end">
                                     <div class="d-flex justify-content-end gap-1 flex-wrap">
-                                        <a href="<?= base_url('owner/participant/kelola/' . $part['id']) ?>" 
+                                        <a href="<?= base_url('owner/payment-verification?participant_id=' . (int)$part['id'] . '&tab=pending') ?>" 
                                            class="btn btn-success btn-sm rounded-pill px-3 d-flex align-items-center"
-                                           title="Kelola (jadwal, hotel, kamar)">
+                                           title="Kelola (verifikasi pembayaran jamaah ini)">
                                             <i class="bi bi-gear-fill me-1"></i> Kelola
                                         </a>
                                         <button type="button" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center btn-history" style="width: 32px; height: 32px;" data-id="<?= $part['id'] ?>" data-name="<?= esc($part['name']) ?>" title="Riwayat Pembayaran"><i class="bi bi-clock-history"></i></button>
-                                        <a href="<?= base_url('owner/participant/receipt/' . $part['id']) ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cetak Kwitansi"><i class="bi bi-printer"></i></a>
+                                        <?php $total_target_part = $part['total_target'] ?? ((float)($part['package_price'] ?? 0) + (float)($part['upgrade_cost'] ?? 0)); $lunas = $total_target_part > 0 && ($part['total_paid'] ?? 0) >= $total_target_part; ?>
+                                        <?php if ($lunas): ?>
+                                        <a href="<?= base_url('owner/participant/receipt/' . $part['id']) ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cetak Kwitansi Lunas"><i class="bi bi-printer"></i></a>
+                                        <?php endif; ?>
                                         <a href="<?= base_url('owner/participant/registration-form/' . $part['id']) ?>" target="_blank" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cetak Formulir Pendaftaran"><i class="bi bi-file-earmark-text"></i></a>
                                         <a href="<?= base_url('owner/participant/documents/' . $part['id']) ?>" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Lihat Berkas"><i class="bi bi-file-earmark-check"></i></a>
                                     </div>

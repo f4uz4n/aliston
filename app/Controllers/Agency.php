@@ -573,9 +573,10 @@ class Agency extends BaseController
     public function participants()
     {
         $participantModel = new \App\Models\ParticipantModel();
-        
+        $paymentModel = new \App\Models\PaymentModel();
+
         $keyword = $this->request->getGet('search');
-        $builder = $participantModel->select('participants.*, travel_packages.name as package_name, travel_packages.freebies')
+        $builder = $participantModel->select('participants.*, travel_packages.name as package_name, travel_packages.freebies, travel_packages.price as package_price')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->where('participants.agency_id', session()->get('id'));
 
@@ -597,6 +598,12 @@ class Agency extends BaseController
             $freebies = json_decode($p['freebies'], true) ?? [];
             $p['equip_total'] = count($freebies);
             $p['equip_count'] = $equipmentModel->where('participant_id', $p['id'])->where('status', 'collected')->countAllResults();
+
+            // Data pembayaran: harga paket + upgrade (hotel/kamar/bed)
+            $p['total_paid'] = (float)($paymentModel->getTotalPaid($p['id'])['amount'] ?? 0);
+            $p['total_target'] = (float)($p['package_price'] ?? 0) + (float)($p['upgrade_cost'] ?? 0);
+            $p['pembayaran_lunas'] = $p['total_target'] > 0 && $p['total_paid'] >= $p['total_target'];
+            $p['progress_pembayaran'] = $p['total_target'] > 0 ? min(100, round(($p['total_paid'] / $p['total_target']) * 100)) : 0;
         }
 
         $data = [
@@ -611,7 +618,7 @@ class Agency extends BaseController
         $participantModel = new \App\Models\ParticipantModel();
         $keyword = $this->request->getGet('search');
 
-        $builder = $participantModel->select('participants.id, participants.name, participants.nik, travel_packages.name as package_name, travel_packages.price')
+        $builder = $participantModel->select('participants.id, participants.name, participants.nik, participants.upgrade_cost, travel_packages.name as package_name, travel_packages.price as package_price')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->where('participants.agency_id', session()->get('id'));
 
@@ -631,7 +638,9 @@ class Agency extends BaseController
         foreach ($data['participants'] as &$p) {
             $paid = $paymentModel->getTotalPaid($p['id']);
             $p['total_paid'] = $paid['amount'] ?? 0;
-            $p['remaining'] = (float)$p['price'] - (float)$p['total_paid'];
+            $total_tagihan = (float)($p['package_price'] ?? 0) + (float)($p['upgrade_cost'] ?? 0);
+            $p['total_tagihan'] = $total_tagihan;
+            $p['remaining'] = $total_tagihan - (float)$p['total_paid'];
         }
 
         return view('agency/payments', $data);
@@ -640,7 +649,7 @@ class Agency extends BaseController
     public function paymentDetail($participant_id)
     {
         $participantModel = new \App\Models\ParticipantModel();
-        $participant = $participantModel->select('participants.*, travel_packages.name as package_name, travel_packages.price')
+        $participant = $participantModel->select('participants.*, travel_packages.name as package_name, travel_packages.price as package_price')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->find($participant_id);
 
@@ -649,10 +658,16 @@ class Agency extends BaseController
         }
 
         $paymentModel = new \App\Models\PaymentModel();
+        $total_paid = (float)($paymentModel->getTotalPaid($participant_id)['amount'] ?? 0);
+        $total_tagihan = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0);
+        $sisa_tagihan = $total_tagihan - $total_paid;
+
         $data = [
             'participant' => $participant,
             'installments' => $paymentModel->getInstallments($participant_id),
-            'total_paid' => $paymentModel->getTotalPaid($participant_id)['amount'] ?? 0
+            'total_paid' => $total_paid,
+            'total_tagihan' => $total_tagihan,
+            'sisa_tagihan' => $sisa_tagihan
         ];
 
         return view('agency/payment_detail', $data);

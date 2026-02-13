@@ -29,7 +29,12 @@
             </div>
         <?php endif; ?>
 
-        <?php $is_lunas = (float)$total_paid >= (float)$participant['price']; ?>
+        <?php 
+        // Total tagihan = harga paket + biaya upgrade (hotel/kamar/bed) — dari controller
+        $total_tagihan = (float)($total_tagihan ?? ($participant['package_price'] ?? 0) + ($participant['upgrade_cost'] ?? 0)); 
+        $sisa_tagihan = (float)($sisa_tagihan ?? ($total_tagihan - (float)$total_paid));
+        $is_lunas = (float)$total_paid >= $total_tagihan; 
+        ?>
         <?php if ($is_lunas): ?>
         <div class="card border-0 shadow-sm rounded-4 mb-4 bg-success bg-opacity-10 border border-success border-opacity-25">
             <div class="card-body py-4 px-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
@@ -51,11 +56,27 @@
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 h-100">
                     <h6 class="text-white-50 small text-uppercase fw-bold mb-2">Sisa Tagihan</h6>
-                    <h3 class="fw-800 mb-0">Rp <?= number_format((float)$participant['price'] - (float)$total_paid, 0, ',', '.') ?></h3>
-                    <small class="text-white-50 mt-2">Dari total Rp <?= number_format((float)$participant['price'], 0, ',', '.') ?></small>
+                    <h3 class="fw-800 mb-0">Rp <?= number_format($sisa_tagihan, 0, ',', '.') ?></h3>
+                    <small class="text-white-50 mt-2">Dari total Rp <?= number_format($total_tagihan, 0, ',', '.') ?><?= (!empty($participant['upgrade_cost']) && (float)$participant['upgrade_cost'] > 0) ? ' <span class="opacity-75">(Paket + Upgrade)</span>' : '' ?></small>
                 </div>
             </div>
             <div class="col-md-8">
+                <?php if ($is_lunas): ?>
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white border border-success border-opacity-25">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center">
+                            <span class="rounded-circle bg-success bg-opacity-25 p-3 me-3"><i class="bi bi-check2-circle text-success fs-4"></i></span>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">Pembayaran Sudah Lunas</h5>
+                                <p class="text-secondary small mb-0">Tidak dapat menambah cicilan. Cetak kwitansi lunas untuk arsip.</p>
+                            </div>
+                        </div>
+                        <a href="<?= base_url('agency/receipt/'.$participant['id']) ?>" target="_blank" class="btn btn-success rounded-pill px-4 fw-bold">
+                            <i class="bi bi-printer-fill me-2"></i> Cetak Kwitansi Lunas
+                        </a>
+                    </div>
+                </div>
+                <?php else: ?>
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
                     <h5 class="fw-bold text-dark mb-3">Lapor Cicilan Baru</h5>
                     <form action="<?= base_url('agency/store-payment') ?>" method="post" enctype="multipart/form-data" class="row g-3" id="formCicilan">
@@ -63,12 +84,13 @@
                         <input type="hidden" name="participant_id" value="<?= $participant['id'] ?>">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Nominal Bayar</label>
-                            <div class="input-group">
+                            <div class="input-group" id="amount_input_group">
                                 <span class="input-group-text bg-light border-0">Rp</span>
-                                <input type="text" name="amount_display" id="amount_display" class="form-control bg-light border-0" placeholder="0" required autocomplete="off">
+                                <input type="text" name="amount_display" id="amount_display" class="form-control bg-light border-0" placeholder="0" required autocomplete="off" aria-describedby="amount_validation_msg">
                                 <input type="hidden" name="amount" id="amount" value="">
                             </div>
-                            <small class="text-muted">Format: 1.500.000</small>
+                            <small class="text-muted d-block">Format: 1.500.000. Maksimal: Rp <?= number_format($sisa_tagihan, 0, ',', '.') ?> (sisa tagihan)</small>
+                            <div id="amount_validation_msg" class="invalid-feedback" style="display: none;">Nominal tidak boleh melebihi sisa tagihan (Rp <?= number_format($sisa_tagihan, 0, ',', '.') ?>)</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Tanggal Bayar</label>
@@ -89,6 +111,7 @@
                         </div>
                     </form>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -160,9 +183,15 @@
 
 <script>
 (function() {
-    var display = document.getElementById('amount_display');
-    var hidden = document.getElementById('amount');
     var form = document.getElementById('formCicilan');
+    var display = document.getElementById('amount_display');
+    if (!form || !display) return; // Form tidak ada saat pembayaran sudah lunas
+
+    var hidden = document.getElementById('amount');
+    var msgEl = document.getElementById('amount_validation_msg');
+
+    var sisaTagihan = <?= (int) $sisa_tagihan ?>;   // angka tanpa desimal (rupiah penuh)
+    var totalTagihan = <?= (int) $total_tagihan ?>;
 
     function formatRupiah(n) {
         var u = parseInt(n, 10) || 0;
@@ -171,6 +200,25 @@
 
     function parseRupiah(s) {
         return (s || '').replace(/\D/g, '');
+    }
+
+    function checkAmountValid() {
+        var raw = parseRupiah(display.value);
+        var num = parseInt(raw, 10) || 0;
+        var exceeds = num > sisaTagihan;
+        var exceedsTotal = num > totalTagihan;
+        if (num > 0 && (exceeds || exceedsTotal)) {
+            display.classList.add('is-invalid');
+            if (msgEl) {
+                msgEl.style.display = 'block';
+                msgEl.textContent = 'Nominal tidak boleh melebihi sisa tagihan (Rp ' + formatRupiah(sisaTagihan) + ').';
+            }
+            return false;
+        } else {
+            display.classList.remove('is-invalid');
+            if (msgEl) msgEl.style.display = 'none';
+            return true;
+        }
     }
 
     display.addEventListener('input', function() {
@@ -182,17 +230,32 @@
         var newLen = this.value.length;
         var newCursor = Math.max(0, cursor + (newLen - prevLen));
         this.setSelectionRange(newCursor, newCursor);
+        checkAmountValid();
     });
 
     display.addEventListener('blur', function() {
         if (hidden.value) this.value = formatRupiah(hidden.value);
+        checkAmountValid();
     });
 
-    form.addEventListener('submit', function() {
+    form.addEventListener('submit', function(e) {
         var raw = parseRupiah(display.value);
         hidden.value = raw;
-        if (!raw || parseInt(raw, 10) < 1) {
+        var num = parseInt(raw, 10) || 0;
+        if (!raw || num < 1) {
+            e.preventDefault();
             alert('Nominal bayar harus diisi dan lebih dari 0.');
+            display.focus();
+            return false;
+        }
+        if (num > sisaTagihan || num > totalTagihan) {
+            e.preventDefault();
+            display.classList.add('is-invalid');
+            if (msgEl) {
+                msgEl.style.display = 'block';
+                msgEl.textContent = 'Nominal tidak boleh melebihi sisa tagihan (Rp ' + formatRupiah(sisaTagihan) + ').';
+            }
+            alert('Nominal tidak boleh melebihi sisa tagihan (Rp ' + formatRupiah(sisaTagihan) + ').');
             display.focus();
             return false;
         }

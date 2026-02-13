@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\PackageModel;
 use App\Models\UserModel;
 use App\Models\TestimonialModel;
+use App\Models\ArticleModel;
 
 class Home extends BaseController
 {
@@ -16,6 +17,7 @@ class Home extends BaseController
         $userModel = new UserModel();
         $bannerModel = new \App\Models\BannerModel();
         $testimonialModel = new TestimonialModel();
+        $articleModel = new ArticleModel();
 
         $today = date('Y-m-d');
         $allActive = $packageModel->where('departure_date >=', $today)->orderBy('departure_date', 'ASC')->findAll();
@@ -50,6 +52,7 @@ class Home extends BaseController
         $owner = $userModel->where('role', 'owner')->first();
         $banners = $bannerModel->getForSlider();
         $testimonials = $testimonialModel->getVerifiedList(20);
+        $articlesLatest = $articleModel->getPublishedList(6);
         $captchaA = rand(1, 15);
         $captchaB = rand(15, 25);
         session()->set('testimoni_captcha', $captchaA + $captchaB);
@@ -65,8 +68,36 @@ class Home extends BaseController
             'package_list_for_category' => $packageListForCategory,
             'filter_kategori' => $kategori,
             'filter_durasi' => $durasi,
+            'articles_latest' => $articlesLatest,
         ];
         return view('home/index', $data);
+    }
+
+    /**
+     * Halaman daftar berita/artikel (publik).
+     */
+    public function berita()
+    {
+        helper('branding');
+        $articleModel = new ArticleModel();
+        $articles = $articleModel->getPublishedList(20);
+        $data = ['articles' => $articles];
+        return view('home/berita', $data);
+    }
+
+    /**
+     * Halaman detail artikel by slug (publik).
+     */
+    public function beritaDetail($slug)
+    {
+        helper('branding');
+        $articleModel = new ArticleModel();
+        $article = $articleModel->getBySlugPublic($slug);
+        if (!$article) {
+            return redirect()->to('/berita')->with('error', 'Artikel tidak ditemukan.');
+        }
+        $data = ['article' => $article];
+        return view('home/berita_detail', $data);
     }
 
     /**

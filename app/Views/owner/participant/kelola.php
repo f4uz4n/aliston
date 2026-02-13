@@ -97,7 +97,7 @@ $isCancelled = ($participant['status'] ?? '') === 'cancelled';
                                     <i class="bi bi-plus-circle me-1"></i> Tambah Pembayaran (Kantor)
                                 </a>
                                 <?php endif; ?>
-                                <a href="<?= base_url('owner/payment-verification?tab=history') ?>" class="btn btn-outline-primary btn-sm rounded-pill">Verifikasi Pembayaran</a>
+                                <a href="<?= base_url('owner/payment-verification?participant_id=' . (int)$participant['id'] . '&tab=pending') ?>" class="btn btn-outline-primary btn-sm rounded-pill">Verifikasi Pembayaran</a>
                             </div>
                         </div>
                     </div>

@@ -126,7 +126,8 @@
         <div class="col-4">
             <div class="info-label">Paket Perjalanan</div>
             <div class="info-value"><?= esc($participant['package_name']) ?></div>
-            <div class="small text-secondary">Harga: Rp <?= number_format($participant['package_price'], 0, ',', '.') ?></div>
+            <?php $total_target_receipt = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0); ?>
+            <div class="small text-secondary">Total: Rp <?= number_format($total_target_receipt, 0, ',', '.') ?><?= (!empty($participant['upgrade_cost']) && (float)$participant['upgrade_cost'] > 0) ? ' <span class="text-muted">(Paket + Upgrade)</span>' : '' ?></div>
         </div>
         <div class="col-4 text-end">
             <div class="info-label">Tanggal Cetak</div>
@@ -201,8 +202,8 @@
             </div>
             <div class="col-6 text-end border-start">
                 <h6 class="fw-800 text-secondary mb-0" style="font-size: 0.7rem;">Sisa Tagihan</h6>
-                <h4 class="fw-800 <?= ($participant['package_price'] - $total_paid > 0) ? 'text-danger' : 'text-success' ?> mb-0">
-                    Rp <?= number_format(max(0, $participant['package_price'] - $total_paid), 0, ',', '.') ?>
+                <h4 class="fw-800 <?= (($total_target_receipt ?? (($participant['package_price'] ?? 0) + ($participant['upgrade_cost'] ?? 0))) - $total_paid > 0) ? 'text-danger' : 'text-success' ?> mb-0">
+                    Rp <?= number_format(max(0, ($total_target_receipt ?? (($participant['package_price'] ?? 0) + ($participant['upgrade_cost'] ?? 0))) - $total_paid), 0, ',', '.') ?>
                 </h4>
             </div>
         </div>

@@ -234,6 +234,45 @@ $paketChunks = array_chunk($packages ?? [], 3);
 </section>
 
 <?php
+$articles_latest = $articles_latest ?? [];
+if (!empty($articles_latest)):
+?>
+<section id="berita" class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="section-title display-6 mb-2">Berita & Artikel</h2>
+                <p class="text-secondary mb-0">Artikel terbaru dari <?= esc($companyName) ?></p>
+            </div>
+            <a href="<?= base_url('berita') ?>" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Semua Berita <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            <?php foreach (array_slice($articles_latest, 0, 3) as $art): ?>
+            <div class="col-md-4">
+                <a href="<?= base_url('berita/' . esc($art['slug'])) ?>" class="text-decoration-none text-dark">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-package">
+                        <?php if (!empty($art['image'])): ?>
+                            <img src="<?= base_url($art['image']) ?>" class="card-img-top" alt="<?= esc($art['title']) ?>" style="height: 180px; object-fit: cover;">
+                        <?php else: ?>
+                            <div class="card-img-top bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 180px;">
+                                <i class="bi bi-newspaper text-primary display-4"></i>
+                            </div>
+                        <?php endif; ?>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-dark mb-2"><?= esc($art['title']) ?></h5>
+                            <p class="small text-secondary mb-0"><?= esc(strlen($art['excerpt'] ?? '') > 100 ? substr($art['excerpt'], 0, 100) . '…' : ($art['excerpt'] ?? '')) ?></p>
+                            <small class="text-muted d-block mt-2"><?= !empty($art['published_at']) ? date('d M Y', strtotime($art['published_at'])) : '' ?></small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php
 $testimonials = $testimonials ?? [];
 $captcha_a = $captcha_a ?? 1;
 $captcha_b = $captcha_b ?? 1;
@@ -315,7 +354,7 @@ $testimoniChunks = array_chunk($testimonials, 3);
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
                     <div class="card-body">
                         <h5 class="fw-bold text-dark mb-4"><i class="bi bi-telephone text-primary me-2"></i>Kontak</h5>
-                        <p class="text-secondary mb-3">Ingin daftar atau butuh informasi? Hubungi kami atau lihat daftar agen mitra di menu Agen Mitra.</p>
+                        <p class="text-secondary mb-3">Ingin daftar atau butuh informasi? Hubungi kami.</p>
                         <h6 class="fw-bold text-dark mb-3"><?= esc($companyName) ?></h6>
                         <?php if ($ownerPhone): ?>
                         <p class="mb-2"><i class="bi bi-whatsapp text-success me-2"></i> <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $ownerPhone) ?>" target="_blank" rel="noopener"><?= esc($ownerPhone) ?></a></p>
@@ -324,10 +363,10 @@ $testimoniChunks = array_chunk($testimonials, 3);
                         <p class="mb-2"><i class="bi bi-envelope text-primary me-2"></i> <a href="mailto:<?= esc($ownerEmail) ?>"><?= esc($ownerEmail) ?></a></p>
                         <?php endif; ?>
                         <?php if (!$ownerPhone && !$ownerEmail): ?>
-                        <p class="text-secondary mb-0">Silakan lihat daftar agen mitra di menu Agen Mitra atau hubungi admin untuk pendaftaran.</p>
+                        <p class="text-secondary mb-0">Silakan hubungi admin untuk pendaftaran.</p>
                         <?php endif; ?>
                         <hr>
-                        <p class="small text-secondary mb-0">Untuk pendaftaran paket, hubungi admin (kontak di atas) atau buka menu Agen Mitra untuk daftar agen terdaftar.</p>
+                        <p class="small text-secondary mb-0">Untuk pendaftaran paket, hubungi admin (kontak di atas).</p>
                     </div>
                 </div>
             </div>

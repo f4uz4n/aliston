@@ -56,7 +56,7 @@
                     <li class="nav-item"><a class="nav-link" href="<?= base_url() ?>#hero">Beranda</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= base_url() ?>#layanan">Layanan</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= base_url() ?>#paket">Paket</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= base_url('agen-mitra') ?>">Agen Mitra</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= base_url('berita') ?>">Berita</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= base_url() ?>#kontak">Kontak</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= base_url() ?>#testimoni">Testimoni Jamaah</a></li>
                 </ul>

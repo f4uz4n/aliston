@@ -217,16 +217,24 @@ class Owner extends BaseController
     public function paymentVerification()
     {
         $paymentModel = new \App\Models\PaymentModel();
-        
+        $participantModel = new ParticipantModel();
+
+        // Tab default: Perlu Verifikasi (pending)
         $tab = $this->request->getGet('tab') ?? 'pending';
         $search = $this->request->getGet('search');
+        $participantId = $this->request->getGet('participant_id');
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
-        
-        $builder = $paymentModel->select('participant_payments.*, participants.name as participant_name, participants.nik as participant_nik, users.full_name as agency_name, travel_packages.name as package_name, travel_packages.price as package_price')
+
+        $builder = $paymentModel->select('participant_payments.*, participants.name as participant_name, participants.nik as participant_nik, participants.upgrade_cost, users.full_name as agency_name, travel_packages.name as package_name, travel_packages.price as package_price')
             ->join('participants', 'participants.id = participant_payments.participant_id')
             ->join('users', 'users.id = participants.agency_id')
             ->join('travel_packages', 'travel_packages.id = participants.package_id');
+
+        // Filter by jamaah (participant) yang dipilih
+        if ($participantId !== null && $participantId !== '') {
+            $builder->where('participants.id', (int) $participantId);
+        }
 
         // Apply Search Filters
         if ($search) {
@@ -245,7 +253,7 @@ class Owner extends BaseController
         if ($endDate) {
             $builder->where('DATE(participant_payments.payment_date) <=', $endDate);
         }
-            
+
         if ($tab === 'history') {
             $builder->whereIn('participant_payments.status', ['verified', 'rejected']);
             $builder->orderBy('participant_payments.updated_at', 'DESC');
@@ -253,28 +261,34 @@ class Owner extends BaseController
             $builder->where('participant_payments.status', 'pending');
             $builder->orderBy('participant_payments.created_at', 'ASC');
         }
-            
+
         $payments = $builder->findAll();
 
-        // Enrich data with payment progress
+        // Enrich data with payment progress (total = harga paket + upgrade)
         foreach ($payments as &$p) {
             $paid = $paymentModel->getTotalPaid($p['participant_id']);
             $p['total_paid_verified'] = $paid['amount'] ?? 0;
-            $p['remaining_balance'] = (float)$p['package_price'] - (float)$p['total_paid_verified'];
-            
-            // Calculate percentage
-            if ($p['package_price'] > 0) {
-                $p['progress_percentage'] = min(100, round(($p['total_paid_verified'] / $p['package_price']) * 100));
+            $total_target = (float)($p['package_price'] ?? 0) + (float)($p['upgrade_cost'] ?? 0);
+            $p['total_target'] = $total_target;
+            $p['remaining_balance'] = $total_target - (float)$p['total_paid_verified'];
+
+            if ($total_target > 0) {
+                $p['progress_percentage'] = min(100, round(($p['total_paid_verified'] / $total_target) * 100));
             } else {
                 $p['progress_percentage'] = 0;
             }
         }
 
+        // Daftar jamaah untuk dropdown filter (select by nama jamaah)
+        $participantsList = $participantModel->select('id, name')->orderBy('name', 'ASC')->findAll();
+
         $data = [
             'payments' => $payments,
             'active_tab' => $tab,
+            'participants_list' => $participantsList,
             'filters' => [
                 'search' => $search,
+                'participant_id' => $participantId,
                 'start_date' => $startDate,
                 'end_date' => $endDate
             ]
@@ -402,6 +416,9 @@ class Owner extends BaseController
             'phone' => $this->request->getPost('phone'),
             'address' => $this->request->getPost('address'),
             'company_name' => $this->request->getPost('company_name'),
+            'slogan' => $this->request->getPost('slogan'),
+            'no_sk_perijinan' => $this->request->getPost('no_sk_perijinan'),
+            'tanggal_sk_perijinan' => $this->request->getPost('tanggal_sk_perijinan') ?: null,
         ];
 
         // Optional password update
