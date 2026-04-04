@@ -34,7 +34,7 @@ class Participant extends BaseController
 
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -93,7 +93,7 @@ class Participant extends BaseController
 
     public function documents($id = null)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -167,7 +167,7 @@ class Participant extends BaseController
 
     public function verifyDocument()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -185,7 +185,7 @@ class Participant extends BaseController
 
     public function uploadDocument()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -232,7 +232,7 @@ class Participant extends BaseController
 
     public function receipt($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -274,7 +274,7 @@ class Participant extends BaseController
      */
     public function registrationFormPrint($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -360,7 +360,7 @@ class Participant extends BaseController
 
     public function paymentHistory($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
@@ -377,7 +377,7 @@ class Participant extends BaseController
 
     public function transactionReceipt($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -427,7 +427,7 @@ class Participant extends BaseController
      */
     public function kelola($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -501,7 +501,7 @@ class Participant extends BaseController
      */
     public function editParticipant($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -535,7 +535,7 @@ class Participant extends BaseController
      */
     public function updateParticipant($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -662,7 +662,7 @@ class Participant extends BaseController
      */
     public function updateSchedule()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $participantId = (int) $this->request->getPost('participant_id');
@@ -680,7 +680,7 @@ class Participant extends BaseController
 
     public function getUpgradeOptions($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
@@ -714,7 +714,7 @@ class Participant extends BaseController
 
     public function saveUpgrade()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -764,7 +764,7 @@ class Participant extends BaseController
 
     public function boarding()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -792,7 +792,7 @@ class Participant extends BaseController
 
     public function processBoarding()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -830,7 +830,7 @@ class Participant extends BaseController
      */
     public function confirmBoarding()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $participantId = (int) $this->request->getPost('participant_id');
@@ -869,7 +869,7 @@ class Participant extends BaseController
      */
     public function boardingList()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $packageId = $this->request->getGet('package_id');
@@ -930,7 +930,7 @@ class Participant extends BaseController
      */
     public function boardingListPrint()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $packageId = $this->request->getGet('package_id');
@@ -977,7 +977,7 @@ class Participant extends BaseController
      */
     public function boardingListExport()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $packageId = $this->request->getGet('package_id');
@@ -1037,7 +1037,7 @@ class Participant extends BaseController
 
     public function boardingManifest($packageId)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -1068,7 +1068,7 @@ class Participant extends BaseController
      */
     public function cancellations()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -1114,7 +1114,7 @@ class Participant extends BaseController
      */
     public function cancelForm($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -1168,7 +1168,7 @@ class Participant extends BaseController
      */
     public function storeCancellation()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -1208,7 +1208,7 @@ class Participant extends BaseController
      */
     public function reactivate($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $p = $this->participantModel->find($id);
@@ -1234,7 +1234,7 @@ class Participant extends BaseController
      */
     public function cancellationStatement($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $participant = $this->participantModel->getParticipantBuilder()
@@ -1270,7 +1270,7 @@ class Participant extends BaseController
      */
     public function registerFromOffice()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $agencyId = $this->getKantorPusatAgencyId();
@@ -1292,7 +1292,7 @@ class Participant extends BaseController
      */
     public function registerFromOfficeForm($package_id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $agencyId = $this->getKantorPusatAgencyId();
@@ -1320,7 +1320,7 @@ class Participant extends BaseController
      */
     public function storeRegistrationFromOffice()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $agencyId = $this->getKantorPusatAgencyId();
@@ -1423,7 +1423,7 @@ class Participant extends BaseController
      */
     public function addPayment($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -1458,7 +1458,7 @@ class Participant extends BaseController
      */
     public function storePaymentFromOffice()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 

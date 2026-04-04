@@ -15,7 +15,7 @@ class AgencyAdmin extends BaseController
 
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -50,7 +50,7 @@ class AgencyAdmin extends BaseController
 
     public function create()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -59,7 +59,7 @@ class AgencyAdmin extends BaseController
 
     public function store()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -103,12 +103,12 @@ class AgencyAdmin extends BaseController
 
     public function toggleStatus($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
         $agency = $this->userModel->find($id);
-        if (!$agency) {
+        if (!$agency || ($agency['role'] ?? '') !== 'agency') {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Agensi tidak ditemukan']);
         }
 
@@ -124,12 +124,12 @@ class AgencyAdmin extends BaseController
 
     public function edit($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
         $agency = $this->userModel->find($id);
-        if (!$agency) {
+        if (!$agency || ($agency['role'] ?? '') !== 'agency') {
             return redirect()->to('owner/agency')->with('error', 'Agensi tidak ditemukan');
         }
 
@@ -141,8 +141,13 @@ class AgencyAdmin extends BaseController
 
     public function update($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
+        }
+
+        $agency = $this->userModel->find($id);
+        if (!$agency || ($agency['role'] ?? '') !== 'agency') {
+            return redirect()->to('owner/agency')->with('error', 'Agensi tidak ditemukan');
         }
 
         $rules = [
@@ -187,5 +192,62 @@ class AgencyAdmin extends BaseController
         }
 
         return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data agensi');
+    }
+
+    /**
+     * Form buat akun Admin Kantor (hanya pemilik).
+     */
+    public function createOfficeAdmin()
+    {
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik tour yang dapat membuat akun admin kantor.');
+        }
+
+        return view('owner/office_admin/create');
+    }
+
+    /**
+     * Simpan akun Admin Kantor (role office_admin).
+     */
+    public function storeOfficeAdmin()
+    {
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik tour yang dapat membuat akun admin kantor.');
+        }
+
+        $rules = [
+            'username' => 'required|min_length[3]|is_unique[users.username]',
+            'password' => 'required|min_length[6]',
+            'full_name' => 'required|min_length[3]',
+            'phone' => 'required|min_length[8]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('error', 'Cek kembali isian Anda. Username mungkin sudah terdaftar.');
+        }
+
+        $data = [
+            'username' => $this->request->getPost('username'),
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'full_name' => $this->request->getPost('full_name'),
+            'email' => $this->request->getPost('email'),
+            'phone' => $this->request->getPost('phone'),
+            'address' => $this->request->getPost('address'),
+            'role' => 'office_admin',
+            'is_active' => 1,
+        ];
+
+        $img = $this->request->getFile('profile_pic');
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            $newName = $img->getRandomName();
+            $img->move('uploads/profiles', $newName);
+            $data['profile_pic'] = 'uploads/profiles/' . $newName;
+        }
+
+        if ($this->userModel->insert($data)) {
+            return redirect()->to('owner/agency')->with('msg', 'Akun Admin Kantor berhasil dibuat. Pengguna dapat login dengan username yang didaftarkan.');
+        }
+
+        return redirect()->back()->withInput()->with('error', 'Gagal menyimpan akun admin kantor.');
     }
 }

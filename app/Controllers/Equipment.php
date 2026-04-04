@@ -23,7 +23,7 @@ class Equipment extends BaseController
 
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -36,7 +36,7 @@ class Equipment extends BaseController
 
     public function store()
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
 
         $this->masterModel->save([
@@ -50,7 +50,7 @@ class Equipment extends BaseController
 
     public function update($id)
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
 
         $this->masterModel->update($id, [
@@ -63,7 +63,7 @@ class Equipment extends BaseController
 
     public function toggle($id)
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
 
         $item = $this->masterModel->find($id);
@@ -76,7 +76,7 @@ class Equipment extends BaseController
 
     public function delete($id)
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
         $this->masterModel->delete($id);
         return redirect()->back()->with('msg', 'Atribut berhasil dihapus.');
@@ -86,7 +86,7 @@ class Equipment extends BaseController
 
     public function participants()
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
 
         $filters = [
@@ -129,7 +129,7 @@ class Equipment extends BaseController
 
     public function checklist($participantId)
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
 
         $participant = $this->participantModel->getParticipantBuilder()
@@ -177,7 +177,7 @@ class Equipment extends BaseController
 
     public function syncAll()
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
 
         $participants = $this->participantModel->findAll();
@@ -204,7 +204,7 @@ class Equipment extends BaseController
 
     public function updateStatus()
     {
-        if (session()->get('role') != 'owner')
+        if (! is_back_office())
             return redirect()->to('/login');
 
         $id = $this->request->getPost('id');

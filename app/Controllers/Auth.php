@@ -26,12 +26,12 @@ class Auth extends BaseController
         if ($token) {
             $userData = $this->jwtService->verifyToken($token);
             if ($userData) {
-                return redirect()->to($userData['role'] == 'owner' ? 'owner' : 'agency');
+                return redirect()->to(dashboard_url_for_role($userData['role']));
             }
         }
 
         if (session()->get('isLoggedIn')) {
-            return redirect()->to(session()->get('role') == 'owner' ? 'owner' : 'agency');
+            return redirect()->to(dashboard_url_for_role((string) session()->get('role')));
         }
         return view('auth/login');
     }
@@ -98,7 +98,7 @@ class Auth extends BaseController
                 $session->set($ses_data);
 
                 // Set JWT token di cookie (HttpOnly untuk keamanan)
-                $response = redirect()->to($user['role'] == 'owner' ? 'owner' : 'agency');
+                $response = redirect()->to(dashboard_url_for_role($user['role']));
                 
                 // Set cookie menggunakan Cookie class CodeIgniter 4
                 $cookie = new Cookie(

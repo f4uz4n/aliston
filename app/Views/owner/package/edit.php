@@ -187,12 +187,14 @@
                             <input type="text" name="price" class="form-control bg-light border-0 format-rupiah" value="<?= esc($priceFormatted) ?>" data-value="<?= esc((string)$priceRupiah) ?>" placeholder="31.200.000" required>
                             <small class="text-muted">Tampilan: <strong><?= $priceDisplay ?></strong></small>
                         </div>
+                        <?php if (can_view_commission()): ?>
                         <div class="col-12 col-md-6">
                             <label class="form-label fw-bold small text-uppercase text-secondary ls-1">Komisi Agency (per pax)</label>
                             <?php $komisi = (float)($package['commission_per_pax'] ?? 0); ?>
                             <input type="text" name="commission_per_pax" class="form-control bg-light border-0 format-rupiah" placeholder="500.000" value="<?= esc(number_format($komisi, 0, '', '.')) ?>" data-value="<?= esc((string)(int)$komisi) ?>">
                             <small class="text-muted">Nominal komisi per penumpang untuk agency (format Rupiah, tanpa desimal)</small>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

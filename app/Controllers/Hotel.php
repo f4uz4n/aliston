@@ -24,7 +24,7 @@ class Hotel extends BaseController
 
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -37,7 +37,7 @@ class Hotel extends BaseController
 
     public function create()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -49,7 +49,7 @@ class Hotel extends BaseController
 
     public function store()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -81,7 +81,7 @@ class Hotel extends BaseController
 
     public function edit($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -98,7 +98,7 @@ class Hotel extends BaseController
 
     public function update($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -134,7 +134,7 @@ class Hotel extends BaseController
 
     public function rooms($hotelId)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -152,7 +152,7 @@ class Hotel extends BaseController
 
     public function storeRoom()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -189,7 +189,7 @@ class Hotel extends BaseController
      */
     public function storeRooms()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -257,7 +257,7 @@ class Hotel extends BaseController
 
     public function editRoom($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -284,7 +284,7 @@ class Hotel extends BaseController
 
     public function updateRoom($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -323,7 +323,7 @@ class Hotel extends BaseController
 
     public function deleteRoom($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -333,7 +333,7 @@ class Hotel extends BaseController
 
     public function storeBed()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -357,7 +357,7 @@ class Hotel extends BaseController
 
     public function updateBed($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -379,7 +379,7 @@ class Hotel extends BaseController
 
     public function deleteBed($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 

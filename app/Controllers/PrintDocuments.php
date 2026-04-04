@@ -30,7 +30,7 @@ class PrintDocuments extends BaseController
      */
     public function printLeaveLetter()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -146,13 +146,14 @@ class PrintDocuments extends BaseController
     public function printDepositReceipt()
     {
         $role = session()->get('role');
-        if (!in_array($role, ['owner', 'agency'])) {
+        if (!in_array($role, ['owner', 'office_admin', 'agency'], true)) {
             return redirect()->to('/login');
         }
 
+        $isOwnerSide = in_array($role, ['owner', 'office_admin'], true);
         $depositId = $this->request->getGet('deposit_id');
         if (empty($depositId)) {
-            $redirectUrl = $role === 'owner' ? 'owner/print-documents' : 'agency/tabungan';
+            $redirectUrl = $isOwnerSide ? 'owner/print-documents' : 'agency/tabungan';
             return redirect()->to($redirectUrl)->with('error', 'Pilih setoran terlebih dahulu.');
         }
 
@@ -164,7 +165,7 @@ class PrintDocuments extends BaseController
             ->first();
 
         if (!$deposit) {
-            $redirectUrl = $role === 'owner' ? 'owner/tabungan' : 'agency/tabungan';
+            $redirectUrl = $isOwnerSide ? 'owner/tabungan' : 'agency/tabungan';
             return redirect()->to($redirectUrl)->with('error', 'Data setoran tidak ditemukan.');
         }
 
@@ -178,7 +179,7 @@ class PrintDocuments extends BaseController
 
         // Hanya bisa cetak setoran yang sudah verified
         if (($deposit['status'] ?? 'pending') !== 'verified') {
-            $redirectUrl = $role === 'owner' ? 'owner/tabungan' : 'agency/tabungan';
+            $redirectUrl = $isOwnerSide ? 'owner/tabungan' : 'agency/tabungan';
             return redirect()->to($redirectUrl)->with('error', 'Setoran belum diverifikasi.');
         }
 
@@ -250,7 +251,7 @@ class PrintDocuments extends BaseController
      */
     public function printRecommendationLetter()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -331,7 +332,7 @@ class PrintDocuments extends BaseController
      */
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 

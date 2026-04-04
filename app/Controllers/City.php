@@ -15,7 +15,7 @@ class City extends BaseController
 
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -28,7 +28,7 @@ class City extends BaseController
 
     public function create()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -37,7 +37,7 @@ class City extends BaseController
 
     public function store()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -58,7 +58,7 @@ class City extends BaseController
 
     public function edit($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -72,7 +72,7 @@ class City extends BaseController
 
     public function update($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -90,7 +90,7 @@ class City extends BaseController
 
     public function delete($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 

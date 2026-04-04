@@ -144,11 +144,13 @@
                             <input type="text" name="price" class="form-control bg-light border-0 format-rupiah" placeholder="31.200.000" data-value="0" required>
                             <small class="text-muted">Input nominal penuh. Tampilan: <strong id="priceDisplayPreview">0 JT</strong></small>
                         </div>
+                        <?php if (can_view_commission()): ?>
                         <div class="col-12 col-md-6">
                             <label class="form-label fw-bold small text-uppercase text-secondary ls-1">Komisi Agency (per pax)</label>
                             <input type="text" name="commission_per_pax" class="form-control bg-light border-0 format-rupiah" placeholder="500.000" value="0" data-value="0">
                             <small class="text-muted">Nominal komisi per penumpang untuk agency (format Rupiah, tanpa desimal)</small>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

@@ -17,7 +17,7 @@ $routes->post('auth/login', 'Auth::attemptLogin');
 $routes->post('auth/refresh-token', 'Auth::refreshToken');
 $routes->get('logout', 'Auth::logout');
 
-$routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
+$routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($routes) {
     $routes->get('/', 'Owner::index');
     $routes->get('notifications', 'Owner::getNotifications');
 
@@ -42,6 +42,10 @@ $routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
             $routes->post('toggle-status/(:num)', 'AgencyAdmin::toggleStatus/$1');
         }
         );
+
+        // Admin kantor (hanya pemilik yang boleh buat akun)
+        $routes->get('office-admin/create', 'AgencyAdmin::createOfficeAdmin');
+        $routes->post('office-admin/store', 'AgencyAdmin::storeOfficeAdmin');
 
         // Master Kota
         $routes->group('cities', function ($routes) {
@@ -186,7 +190,7 @@ $routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
         $routes->post('rubrik-berita/toggle-status/(:num)', 'RubrikBerita::toggleStatus/$1');
     });
 
-$routes->group('package', ['filter' => 'auth:owner'], function ($routes) {
+$routes->group('package', ['filter' => 'auth:owner,office_admin'], function ($routes) {
     $routes->get('/', 'Package::index');
     $routes->get('create', 'Package::create');
     $routes->post('store', 'Package::store');
@@ -254,8 +258,8 @@ $routes->group('owner/equipment', ['filter' => 'auth'], function ($routes) {
     $routes->get('sync-all', 'Equipment::syncAll');
 });
 
-// Commission Management
-$routes->group('owner/commissions', ['filter' => 'auth'], function ($routes) {
+// Komisi: hanya pemilik (bukan admin kantor)
+$routes->group('owner/commissions', ['filter' => 'auth:owner'], function ($routes) {
     $routes->get('/', 'Commission::index');
     $routes->get('print/(:num)', 'Commission::printSlip/$1');
     $routes->post('update/(:num)', 'Commission::updateProgress/$1');

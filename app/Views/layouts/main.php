@@ -1,3 +1,4 @@
+<?php helper('access'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -395,7 +396,7 @@
         </div>
 
         <ul class="nav-menu">
-            <?php if(session()->get('role') == 'owner'): ?>
+            <?php if (is_back_office()): ?>
                 <li class="nav-item">
                     <a href="<?= base_url('owner') ?>" class="nav-link <?= current_url() == base_url('owner') ? 'active' : '' ?>">
                         <i class="bi bi-grid-fill"></i>
@@ -494,11 +495,19 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('owner/agency') ?>" class="nav-link <?= strpos(current_url(), 'agency') !== false ? 'active' : '' ?>">
+                            <a href="<?= base_url('owner/agency') ?>" class="nav-link <?= strpos(current_url(), 'owner/agency') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-person-badge-fill"></i>
                                 <span>Daftar Agensi</span>
                             </a>
                         </li>
+                        <?php if (is_owner()): ?>
+                        <li class="nav-item">
+                            <a href="<?= base_url('owner/office-admin/create') ?>" class="nav-link <?= strpos(current_url(), 'office-admin') !== false ? 'active' : '' ?>">
+                                <i class="bi bi-person-workspace"></i>
+                                <span>Tambah Admin Kantor</span>
+                            </a>
+                        </li>
+                        <?php endif; ?>
                     </ul>
                 </li>
 
@@ -516,12 +525,14 @@
                                 <span>Laporan Bisnis</span>
                             </a>
                         </li>
+                        <?php if (can_view_commission()): ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/commissions') ?>" class="nav-link <?= strpos(current_url(), 'commissions') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-wallet2"></i>
                                 <span>Komisi Agensi</span>
                             </a>
                         </li>
+                        <?php endif; ?>
                     </ul>
                 </li>
 
@@ -718,7 +729,7 @@
         </button>
 
         <div class="d-flex align-items-center gap-2">
-            <?php if(session()->get('role') == 'owner'): ?>
+            <?php if (is_back_office()): ?>
             <!-- Notifikasi -->
             <div class="dropdown" id="notificationDropdown">
                 <button class="btn btn-light rounded-circle p-2 position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBtn" style="width: 40px; height: 40px;">
@@ -743,7 +754,7 @@
                     </div>
                     <div class="d-none d-md-block me-2">
                         <span class="small fw-bold d-block"><?= session()->get('username') ?></span>
-                        <span class="text-muted" style="font-size: 0.75rem;"><?= ucfirst(session()->get('role')) ?></span>
+                        <span class="text-muted" style="font-size: 0.75rem;"><?php $rl = session()->get('role'); echo $rl === 'office_admin' ? 'Admin Kantor' : ($rl === 'owner' ? 'Pemilik' : esc(ucfirst((string) $rl))); ?></span>
                     </div>
                     <i class="bi bi-chevron-down small"></i>
                 </div>
@@ -873,7 +884,7 @@
             });
         });
 
-        <?php if(session()->get('role') == 'owner'): ?>
+        <?php if (is_back_office()): ?>
 
         // Load Notifikasi
         (function() {

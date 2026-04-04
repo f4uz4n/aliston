@@ -140,7 +140,7 @@ class Package extends BaseController
 
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -158,7 +158,7 @@ class Package extends BaseController
 
     public function create()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -168,7 +168,7 @@ class Package extends BaseController
 
     public function store()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -202,7 +202,9 @@ class Package extends BaseController
             'inclusions' => json_encode($parseList($inclusions)),
             'freebies' => json_encode($parseList($freebies)),
             'exclusions' => json_encode($parseList($exclusions)),
-            'commission_per_pax' => $this->parseRupiahToNumber($this->request->getPost('commission_per_pax')),
+            'commission_per_pax' => can_view_commission()
+                ? $this->parseRupiahToNumber($this->request->getPost('commission_per_pax'))
+                : 0,
             'branch_info' => $this->request->getPost('branch_info')
         ];
 
@@ -223,7 +225,7 @@ class Package extends BaseController
 
     public function edit($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -248,7 +250,7 @@ class Package extends BaseController
 
     public function update($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -287,7 +289,9 @@ class Package extends BaseController
             'inclusions' => json_encode($parseList($inclusions)),
             'freebies' => json_encode($parseList($freebies)),
             'exclusions' => json_encode($parseList($exclusions)),
-            'commission_per_pax' => $this->parseRupiahToNumber($this->request->getPost('commission_per_pax')),
+            'commission_per_pax' => can_view_commission()
+                ? $this->parseRupiahToNumber($this->request->getPost('commission_per_pax'))
+                : (float) ($package['commission_per_pax'] ?? 0),
             'branch_info' => $this->request->getPost('branch_info')
         ];
 
@@ -325,7 +329,7 @@ class Package extends BaseController
 
     public function delete($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -352,7 +356,7 @@ class Package extends BaseController
      */
     public function toggleStatus($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 

@@ -1,12 +1,21 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
+<?php helper('access'); ?>
+<?php if (session()->getFlashdata('msg')): ?>
+    <div class="alert alert-success border-0 rounded-4 mb-4"><?= session()->getFlashdata('msg') ?></div>
+<?php endif; ?>
 <div class="row align-items-center mb-5">
     <div class="col-12 col-md-6">
         <h2 class="fw-800 text-dark mb-1">Daftar Agensi</h2>
         <p class="text-secondary">Kelola kemitraan agensi Aliston Anda</p>
     </div>
-    <div class="col-12 col-md-6 text-md-end">
+    <div class="col-12 col-md-6 text-md-end d-flex flex-wrap gap-2 justify-content-md-end">
+        <?php if (is_owner()): ?>
+        <a href="<?= base_url('owner/office-admin/create') ?>" class="btn btn-outline-primary rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-2">
+            <i class="bi bi-person-workspace"></i> Admin Kantor
+        </a>
+        <?php endif; ?>
         <a href="<?= base_url('owner/agency/create') ?>" class="btn-premium d-inline-flex align-items-center gap-2">
             <i class="bi bi-person-plus-fill"></i> Daftarkan Agensi Baru
         </a>

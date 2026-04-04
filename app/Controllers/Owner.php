@@ -372,7 +372,7 @@ class Owner extends BaseController
      */
     public function editPayment($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $paymentModel = new \App\Models\PaymentModel();
@@ -397,7 +397,7 @@ class Owner extends BaseController
      */
     public function updatePayment($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $paymentModel = new \App\Models\PaymentModel();
@@ -437,7 +437,7 @@ class Owner extends BaseController
      */
     public function deletePayment($id)
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
         $paymentModel = new \App\Models\PaymentModel();
@@ -765,7 +765,7 @@ class Owner extends BaseController
      */
     public function getNotifications()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 

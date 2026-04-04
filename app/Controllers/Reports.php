@@ -9,7 +9,7 @@ class Reports extends BaseController
 {
     public function index()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -76,7 +76,7 @@ class Reports extends BaseController
      */
     public function registrationsExport()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
@@ -122,7 +122,7 @@ class Reports extends BaseController
 
     public function equipment()
     {
-        if (session()->get('role') != 'owner') {
+        if (! is_back_office()) {
             return redirect()->to('/login');
         }
 
