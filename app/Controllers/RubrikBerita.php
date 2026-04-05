@@ -16,6 +16,37 @@ class RubrikBerita extends BaseController
         $this->userModel = new UserModel();
     }
 
+    /**
+     * Ubah nilai datetime-local (YYYY-MM-DDTHH:MM) ke format MySQL datetime.
+     * Jika kosong saat publikasi, gunakan $fallbackIfEmpty (mis. tanggal terbit lama saat edit).
+     */
+    protected function normalizePublishedAt(?string $raw, bool $published, ?string $fallbackIfEmpty = null): ?string
+    {
+        if (! $published) {
+            return null;
+        }
+        $raw = trim((string) $raw);
+        if ($raw === '') {
+            if ($fallbackIfEmpty !== null && $fallbackIfEmpty !== '') {
+                $ts = strtotime($fallbackIfEmpty);
+
+                return $ts !== false ? date('Y-m-d H:i:s', $ts) : date('Y-m-d H:i:s');
+            }
+
+            return date('Y-m-d H:i:s');
+        }
+        $raw = str_replace('T', ' ', $raw);
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $raw)) {
+            $raw .= ':00';
+        }
+        $ts = strtotime($raw);
+        if ($ts === false) {
+            return date('Y-m-d H:i:s');
+        }
+
+        return date('Y-m-d H:i:s', $ts);
+    }
+
     public function index()
     {
         if (! is_back_office()) {
@@ -52,8 +83,8 @@ class RubrikBerita extends BaseController
         }
 
         $slug = $this->articleModel->generateSlug($title);
-        $published = (int) $this->request->getPost('is_published'); // 1 = publikasi, 0 = draft (hidden + checkbox)
-        $publishedAt = $published ? ($this->request->getPost('published_at') ?: date('Y-m-d H:i:s')) : null;
+        $published = (int) $this->request->getPost('is_published');
+        $publishedAt = $this->normalizePublishedAt($this->request->getPost('published_at'), (bool) $published);
 
         $data = [
             'title' => $title,
@@ -115,8 +146,12 @@ class RubrikBerita extends BaseController
         }
 
         $slug = $this->articleModel->generateSlug($title, $id);
-        $published = (int) $this->request->getPost('is_published'); // 1 = publikasi, 0 = draft
-        $publishedAt = $published ? ($this->request->getPost('published_at') ?: ($article['published_at'] ?? date('Y-m-d H:i:s'))) : null;
+        $published = (int) $this->request->getPost('is_published');
+        $publishedAt = $this->normalizePublishedAt(
+            $this->request->getPost('published_at'),
+            (bool) $published,
+            $article['published_at'] ?? null
+        );
 
         $data = [
             'title' => $title,
