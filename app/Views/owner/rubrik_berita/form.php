@@ -53,9 +53,8 @@ $article = $article ?? [];
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <div class="form-check form-switch mb-3">
-                        <?php $pubDefault = $isEdit ? (int) ($article['is_published'] ?? 0) : 1; ?>
                         <input type="hidden" name="is_published" value="0">
-                        <input class="form-check-input" type="checkbox" name="is_published" value="1" id="is_published" <?= old('is_published', $pubDefault) ? 'checked' : '' ?>>
+                        <input class="form-check-input" type="checkbox" name="is_published" value="1" id="is_published" <?= (old('is_published', $article['is_published'] ?? 0)) ? 'checked' : '' ?>>
                         <label class="form-check-label fw-bold" for="is_published">Publikasikan (tampil di depan)</label>
                     </div>
                     <div class="mb-0">

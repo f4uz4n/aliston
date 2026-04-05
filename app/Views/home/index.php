@@ -254,6 +254,7 @@ $paketChunks = array_chunk($packages ?? [], 3);
 
 <?php
 $articles_latest = $articles_latest ?? [];
+if (!empty($articles_latest)):
 ?>
 <section id="berita" class="py-5 bg-white">
     <div class="container py-4">
@@ -264,7 +265,6 @@ $articles_latest = $articles_latest ?? [];
             </div>
             <a href="<?= base_url('berita') ?>" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Semua Berita <i class="bi bi-arrow-right ms-1"></i></a>
         </div>
-        <?php if (!empty($articles_latest)): ?>
         <div class="row g-4">
             <?php foreach (array_slice($articles_latest, 0, 3) as $art): ?>
             <div class="col-md-4">
@@ -287,11 +287,9 @@ $articles_latest = $articles_latest ?? [];
             </div>
             <?php endforeach; ?>
         </div>
-        <?php else: ?>
-        <p class="text-secondary mb-0">Belum ada artikel yang dipublikasikan. Setelah artikel dipublikasikan dari panel Rubrik Berita, daftar akan tampil di sini.</p>
-        <?php endif; ?>
     </div>
 </section>
+<?php endif; ?>
 
 <?php
 $testimonials = $testimonials ?? [];

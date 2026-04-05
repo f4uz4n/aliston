@@ -31,14 +31,9 @@ class ArticleModel extends Model
      */
     public function getPublishedList($limit = 10, $offset = 0)
     {
-        $now = date('Y-m-d H:i:s');
-
         return $this->where('is_published', 1)
-            ->groupStart()
-            ->where('published_at <=', $now)
-            ->orWhere('published_at', null)
-            ->groupEnd()
-            ->orderBy('COALESCE(published_at, created_at)', 'DESC', false)
+            ->where('published_at <=', date('Y-m-d H:i:s'))
+            ->orderBy('published_at', 'DESC')
             ->findAll($limit, $offset);
     }
 
@@ -47,14 +42,9 @@ class ArticleModel extends Model
      */
     public function getBySlugPublic($slug)
     {
-        $now = date('Y-m-d H:i:s');
-
         return $this->where('slug', $slug)
             ->where('is_published', 1)
-            ->groupStart()
-            ->where('published_at <=', $now)
-            ->orWhere('published_at', null)
-            ->groupEnd()
+            ->where('published_at <=', date('Y-m-d H:i:s'))
             ->first();
     }
 
