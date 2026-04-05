@@ -27,11 +27,15 @@ class ArticleModel extends Model
     }
 
     /**
-     * Artikel yang dipublikasi untuk tampilan depan (urut terbaru)
+     * Artikel yang dipublikasi untuk tampilan depan (urut terbaru).
+     * Tanpa kolom `content` agar query ringan (daftar kartu hanya butuh ringkasan).
      */
     public function getPublishedList($limit = 10, $offset = 0)
     {
-        return $this->where('is_published', 1)
+        return $this->select(
+            'id, title, slug, excerpt, image, published_at, created_at'
+        )
+            ->where('is_published', 1)
             ->where('published_at <=', date('Y-m-d H:i:s'))
             ->orderBy('published_at', 'DESC')
             ->findAll($limit, $offset);

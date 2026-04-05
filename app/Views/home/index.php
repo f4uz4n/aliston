@@ -271,7 +271,7 @@ if (!empty($articles_latest)):
                 <a href="<?= base_url('berita/' . esc($art['slug'])) ?>" class="text-decoration-none text-dark">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 card-package">
                         <?php if (!empty($art['image'])): ?>
-                            <img src="<?= base_url($art['image']) ?>" class="card-img-top" alt="<?= esc($art['title']) ?>" style="height: 180px; object-fit: cover;">
+                            <img src="<?= base_url($art['image']) ?>" class="card-img-top" alt="<?= esc($art['title']) ?>" width="400" height="180" loading="lazy" decoding="async" style="height: 180px; object-fit: cover;">
                         <?php else: ?>
                             <div class="card-img-top bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 180px;">
                                 <i class="bi bi-newspaper text-primary display-4"></i>
