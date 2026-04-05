@@ -56,24 +56,24 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
         <div class="col-md-3">
             <div class="input-group">
                 <span class="input-group-text bg-light border-0"><i class="bi bi-search text-secondary"></i></span>
-                <input type="text" name="search" class="form-control border-0 bg-light" placeholder="Cari Nama, NIK, Agency, Paket..." value="<?= esc($filters['search']) ?>">
+                <input type="text" name="search" class="form-control border-0 bg-light" placeholder="Cari Nama, NIK, Agency, Paket..." value="<?= esc($filters['search'] ?? '') ?>">
             </div>
         </div>
         <div class="col-md-2">
             <div class="input-group">
                 <span class="input-group-text bg-light border-0 text-secondary small">Mulai:</span>
-                <input type="date" name="start_date" class="form-control border-0 bg-light" value="<?= esc($filters['start_date']) ?>">
+                <input type="date" name="start_date" class="form-control border-0 bg-light" value="<?= esc($filters['start_date'] ?? '') ?>">
             </div>
         </div>
         <div class="col-md-2">
             <div class="input-group">
                 <span class="input-group-text bg-light border-0 text-secondary small">Sampai:</span>
-                <input type="date" name="end_date" class="form-control border-0 bg-light" value="<?= esc($filters['end_date']) ?>">
+                <input type="date" name="end_date" class="form-control border-0 bg-light" value="<?= esc($filters['end_date'] ?? '') ?>">
             </div>
         </div>
         <div class="col-md-2 d-flex gap-2">
             <button type="submit" class="btn btn-primary flex-grow-1 rounded-pill fw-bold">Filter</button>
-            <?php if($filters['search'] || $filters['start_date'] || $filters['end_date'] || ($filters['participant_id'] ?? '') !== ''): ?>
+            <?php if(($filters['search'] ?? '') || ($filters['start_date'] ?? '') || ($filters['end_date'] ?? '') || ($filters['participant_id'] ?? '') !== ''): ?>
                 <a href="<?= base_url('owner/payment-verification?tab=' . $active_tab) ?>" class="btn btn-light rounded-pill border" data-bs-toggle="tooltip" title="Reset Filter"><i class="bi bi-x-lg"></i></a>
             <?php endif; ?>
         </div>
@@ -148,9 +148,13 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
                                 <small class="text-muted d-block mt-1"><?= date('d M Y H:i', strtotime($p['payment_date'])) ?></small>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="showProof('<?= base_url($p['proof']) ?>')">
+                                <?php if (!empty($p['proof'])): ?>
+                                <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="showProof('<?= esc(base_url($p['proof']), 'js') ?>')">
                                     <i class="bi bi-eye me-1"></i> Lihat
                                 </button>
+                                <?php else: ?>
+                                <span class="text-muted small">—</span>
+                                <?php endif; ?>
                             </td>
                             <td class="pe-4 text-end">
                                 <?php if($active_tab === 'pending'): ?>

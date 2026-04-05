@@ -15,6 +15,9 @@ class App extends BaseConfig
      * WITH a trailing slash:
      *
      * E.g., http://example.com/
+     *
+     * Production: wajib setel di .env, contoh: app.baseURL = 'https://domain-anda.com/'
+     * (tanpa ini, helper URL bisa error di PHP 8.1+).
      */
     public string $baseURL = 'http://localhost:8080/';
 
