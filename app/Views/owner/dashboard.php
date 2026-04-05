@@ -1,4 +1,5 @@
 <?= $this->extend('layouts/main') ?>
+<?php helper('access'); ?>
 
 <?= $this->section('content') ?>
 <div class="row align-items-center mb-4">
@@ -30,6 +31,7 @@
                     <input type="date" name="end_date" class="form-control bg-light border-0" value="<?= $filters['end_date'] ?? '' ?>">
                 </div>
             </div>
+            <?php if (is_owner()): ?>
             <div class="col-12 col-md-3">
                 <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Pilih Agensi</label>
                 <select name="agency_id" class="form-select bg-light border-0">
@@ -43,6 +45,7 @@
                     <?php endif; ?>
                 </select>
             </div>
+            <?php endif; ?>
             <div class="col-12 col-md-3">
                 <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Paket Perjalanan</label>
                 <select name="package_id" class="form-select bg-light border-0">
@@ -237,8 +240,9 @@
         </div>
     </div>
 
-    <!-- Right Sidebar on Dashboard: Top Agencies -->
+    <!-- Right Sidebar on Dashboard: Top Agencies (hanya pemilik) -->
     <div class="col-12 col-lg-5">
+        <?php if (is_owner()): ?>
         <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
             <div class="card-header bg-transparent border-0 py-4 px-4 border-bottom">
                 <h5 class="fw-bold text-dark mb-0 text-center">Ranking Agensi Teraktif</h5>
@@ -268,6 +272,7 @@
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 
         <!-- Materials Count / Quick Access -->
         <div class="card border-0 shadow-sm rounded-4 bg-dark text-white p-4 text-center">

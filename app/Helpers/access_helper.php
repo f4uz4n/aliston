@@ -30,6 +30,14 @@ if (! function_exists('can_view_commission')) {
     }
 }
 
+if (! function_exists('can_manage_agency')) {
+    /** Daftar agensi, tambah agensi, admin kantor baru — hanya pemilik. */
+    function can_manage_agency(): bool
+    {
+        return is_owner();
+    }
+}
+
 if (! function_exists('dashboard_url_for_role')) {
     function dashboard_url_for_role(string $role): string
     {

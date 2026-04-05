@@ -41,15 +41,15 @@ class Auth extends BaseController
         $session = session();
         $model = new UserModel();
         
-        // Sanitize input untuk mencegah XSS
-        $username = esc($this->request->getPost('username'));
+        // Username/password untuk DB: jangan pakai esc() (bisa mengacau pencocokan & XSS tidak relevan di sini)
+        $username = trim((string) $this->request->getPost('username'));
         $password = $this->request->getPost('password');
 
         // Validasi input
         $validation = \Config\Services::validation();
         if (!$validation->run([
             'username' => $username,
-            'password' => $password
+            'password' => $password,
         ], 'login')) {
             return view('auth/login', ['validation' => $validation]);
         }
@@ -77,6 +77,8 @@ class Auth extends BaseController
                     return redirect()->to('login');
                 }
 
+                $role = trim((string) ($user['role'] ?? ''));
+
                 // Reset rate limiting setelah login berhasil
                 $this->rateLimiter->resetAttempts($identifier);
 
@@ -84,21 +86,21 @@ class Auth extends BaseController
                 $token = $this->jwtService->generateToken([
                     'id' => $user['id'],
                     'username' => $user['username'],
-                    'role' => $user['role']
+                    'role' => $role,
                 ]);
 
                 // Set session data (untuk kompatibilitas)
                 $ses_data = [
                     'id'       => $user['id'],
                     'username' => $user['username'],
-                    'role'     => $user['role'],
+                    'role'     => $role,
                     'isLoggedIn' => TRUE,
                     'jwt_token' => $token
                 ];
                 $session->set($ses_data);
 
                 // Set JWT token di cookie (HttpOnly untuk keamanan)
-                $response = redirect()->to(dashboard_url_for_role($user['role']));
+                $response = redirect()->to(dashboard_url_for_role($role));
                 
                 // Set cookie menggunakan Cookie class CodeIgniter 4
                 $cookie = new Cookie(

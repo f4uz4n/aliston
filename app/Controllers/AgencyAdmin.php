@@ -15,8 +15,8 @@ class AgencyAdmin extends BaseController
 
     public function index()
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat mengelola agensi.');
         }
 
         $search = $this->request->getGet('search');
@@ -50,8 +50,8 @@ class AgencyAdmin extends BaseController
 
     public function create()
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat mengelola agensi.');
         }
 
         return view('owner/agency/create');
@@ -59,8 +59,8 @@ class AgencyAdmin extends BaseController
 
     public function store()
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat mengelola agensi.');
         }
 
         $rules = [
@@ -103,7 +103,7 @@ class AgencyAdmin extends BaseController
 
     public function toggleStatus($id)
     {
-        if (! is_back_office()) {
+        if (! is_owner()) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
@@ -124,8 +124,8 @@ class AgencyAdmin extends BaseController
 
     public function edit($id)
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat mengelola agensi.');
         }
 
         $agency = $this->userModel->find($id);
@@ -141,8 +141,8 @@ class AgencyAdmin extends BaseController
 
     public function update($id)
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat mengelola agensi.');
         }
 
         $agency = $this->userModel->find($id);

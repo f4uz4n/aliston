@@ -12,10 +12,13 @@ class Owner extends BaseController
 {
     public function index()
     {
+        helper('access');
         $materialModel = new MaterialModel();
         $userModel = new UserModel();
         $participantModel = new \App\Models\ParticipantModel();
         $packageModel = new \App\Models\PackageModel();
+
+        $isOwner = is_owner();
 
         // Get Filter Parameters
         $filters = [
@@ -24,13 +27,16 @@ class Owner extends BaseController
             'agency_id' => $this->request->getGet('agency_id'),
             'package_id' => $this->request->getGet('package_id'),
         ];
+        if (! $isOwner) {
+            $filters['agency_id'] = null;
+        }
 
         // 1. Stats Calculation
         $registrations = $participantModel->getFilteredParticipants($filters) ?? [];
 
         $stats = [
             'total_jamaah' => count($registrations),
-            'total_agencies' => $userModel->where('role', 'agency')->countAllResults(),
+            'total_agencies' => $isOwner ? $userModel->where('role', 'agency')->countAllResults() : 0,
             'total_packages' => $packageModel->countAllResults(),
             'verified_jamaah' => 0,
             'pending_jamaah' => 0,
@@ -46,13 +52,15 @@ class Owner extends BaseController
         // 2. Chart Data: Trends (Last 30 Days if no date filter, otherwise filtered)
         $registrationTrends = $participantModel->getRegistrationTrends() ?? [];
 
-        // 3. Agency Distribution
-        $agencyPerformance = $participantModel->select('users.full_name, COUNT(participants.id) as total')
-            ->join('users', 'users.id = participants.agency_id')
-            ->groupBy('participants.agency_id')
-            ->orderBy('total', 'DESC')
-            ->limit(5)
-            ->findAll() ?? [];
+        // 3. Agency Distribution (hanya pemilik — admin kantor tidak melihat peringkat agensi)
+        $agencyPerformance = $isOwner
+            ? ($participantModel->select('users.full_name, COUNT(participants.id) as total')
+                ->join('users', 'users.id = participants.agency_id')
+                ->groupBy('participants.agency_id')
+                ->orderBy('total', 'DESC')
+                ->limit(5)
+                ->findAll() ?? [])
+            : [];
 
         // 4. Package distribution
         $packageDistribution = $participantModel->select('travel_packages.name, COUNT(participants.id) as total')
@@ -68,7 +76,7 @@ class Owner extends BaseController
         $chartCancellation = [];
         $chartDeparture = [];
         $db = \Config\Database::connect();
-        $agencyId = $filters['agency_id'] ?? null;
+        $agencyId = $isOwner ? ($filters['agency_id'] ?? null) : null;
         $packageId = $filters['package_id'] ?? null;
 
         $current = strtotime(date('Y-m-01', strtotime($chartStart)));
@@ -111,7 +119,7 @@ class Owner extends BaseController
             'stats' => $stats,
             'registrations' => $registrations,
             'trends' => $registrationTrends,
-            'agencies_list' => $userModel->where('role', 'agency')->findAll() ?? [],
+            'agencies_list' => $isOwner ? ($userModel->where('role', 'agency')->findAll() ?? []) : [],
             'packages_list' => $packageModel->findAll() ?? [],
             'agency_perf' => $agencyPerformance,
             'package_dist' => $packageDistribution,

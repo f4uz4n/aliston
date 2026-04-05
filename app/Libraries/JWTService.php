@@ -14,8 +14,11 @@ class JWTService
 
     public function __construct()
     {
-        // Ambil secret key dari .env atau gunakan default
-        $this->secretKey = getenv('JWT_SECRET_KEY') ?: 'your-secret-key-change-this-in-production-' . base64_encode(random_bytes(32));
+        // Secret harus stabil antar-request; jangan generate random di sini (token login jadi tidak bisa diverifikasi)
+        $key = env('JWT_SECRET_KEY', '');
+        $this->secretKey = is_string($key) && $key !== ''
+            ? $key
+            : 'tour-n-travel-ci4-dev-jwt-set-JWT_SECRET_KEY-di-env';
     }
 
     /**
@@ -46,7 +49,12 @@ class JWTService
     {
         try {
             $decoded = JWT::decode($token, new Key($this->secretKey, $this->algorithm));
-            return (array) $decoded->data;
+            $data = (array) $decoded->data;
+            if (isset($data['role'])) {
+                $data['role'] = trim((string) $data['role']);
+            }
+
+            return $data;
         } catch (\Exception $e) {
             // Token invalid, expired, atau error lainnya
             log_message('error', 'JWT Verification Failed: ' . $e->getMessage());

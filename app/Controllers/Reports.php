@@ -9,8 +9,8 @@ class Reports extends BaseController
 {
     public function index()
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat membuka laporan bisnis.');
         }
 
         $participantModel = new ParticipantModel();
@@ -76,8 +76,8 @@ class Reports extends BaseController
      */
     public function registrationsExport()
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat membuka laporan bisnis.');
         }
 
         $startDate = $this->request->getGet('start_date') ?: date('Y-m-d', strtotime('-6 months'));
@@ -122,8 +122,8 @@ class Reports extends BaseController
 
     public function equipment()
     {
-        if (! is_back_office()) {
-            return redirect()->to('/login');
+        if (! is_owner()) {
+            return redirect()->to('owner')->with('error', 'Hanya pemilik yang dapat membuka laporan bisnis.');
         }
 
         $db = \Config\Database::connect();

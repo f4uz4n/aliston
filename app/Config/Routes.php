@@ -32,21 +32,6 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
         }
         );
 
-        // Agency Management
-        $routes->group('agency', function ($routes) {
-            $routes->get('/', 'AgencyAdmin::index');
-            $routes->get('create', 'AgencyAdmin::create');
-            $routes->post('store', 'AgencyAdmin::store');
-            $routes->get('edit/(:num)', 'AgencyAdmin::edit/$1');
-            $routes->post('update/(:num)', 'AgencyAdmin::update/$1');
-            $routes->post('toggle-status/(:num)', 'AgencyAdmin::toggleStatus/$1');
-        }
-        );
-
-        // Admin kantor (hanya pemilik yang boleh buat akun)
-        $routes->get('office-admin/create', 'AgencyAdmin::createOfficeAdmin');
-        $routes->post('office-admin/store', 'AgencyAdmin::storeOfficeAdmin');
-
         // Master Kota
         $routes->group('cities', function ($routes) {
             $routes->get('/', 'City::index');
@@ -142,11 +127,6 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
         $routes->post('tabungan/update-deposit/(:num)', 'Tabungan::updateDeposit/$1');
         $routes->post('tabungan/delete-deposit/(:num)', 'Tabungan::deleteDeposit/$1');
 
-        // Reports
-        $routes->get('reports', 'Reports::index');
-        $routes->get('reports/equipment', 'Reports::equipment');
-        $routes->get('reports/registrations-export', 'Reports::registrationsExport');
-
         // Account Settings
         $routes->get('settings', 'Owner::settings');
         $routes->post('update-settings', 'Owner::updateSettings');
@@ -189,6 +169,23 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
         $routes->get('rubrik-berita/delete/(:num)', 'RubrikBerita::delete/$1');
         $routes->post('rubrik-berita/toggle-status/(:num)', 'RubrikBerita::toggleStatus/$1');
     });
+
+// Agensi, pembuatan admin kantor, laporan bisnis (berisi data agensi): hanya pemilik
+$routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
+    $routes->group('agency', function ($routes) {
+        $routes->get('/', 'AgencyAdmin::index');
+        $routes->get('create', 'AgencyAdmin::create');
+        $routes->post('store', 'AgencyAdmin::store');
+        $routes->get('edit/(:num)', 'AgencyAdmin::edit/$1');
+        $routes->post('update/(:num)', 'AgencyAdmin::update/$1');
+        $routes->post('toggle-status/(:num)', 'AgencyAdmin::toggleStatus/$1');
+    });
+    $routes->get('office-admin/create', 'AgencyAdmin::createOfficeAdmin');
+    $routes->post('office-admin/store', 'AgencyAdmin::storeOfficeAdmin');
+    $routes->get('reports', 'Reports::index');
+    $routes->get('reports/equipment', 'Reports::equipment');
+    $routes->get('reports/registrations-export', 'Reports::registrationsExport');
+});
 
 $routes->group('package', ['filter' => 'auth:owner,office_admin'], function ($routes) {
     $routes->get('/', 'Package::index');

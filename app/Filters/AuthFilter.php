@@ -31,7 +31,7 @@ class AuthFilter implements FilterInterface
                 session()->set([
                     'id' => $userData['id'],
                     'username' => $userData['username'],
-                    'role' => $userData['role'],
+                    'role' => trim((string) ($userData['role'] ?? '')),
                     'isLoggedIn' => true
                 ]);
             }
@@ -43,7 +43,7 @@ class AuthFilter implements FilterInterface
             $userData = [
                 'id' => session()->get('id'),
                 'username' => session()->get('username'),
-                'role' => session()->get('role')
+                'role' => trim((string) session()->get('role')),
             ];
         }
 

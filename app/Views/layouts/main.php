@@ -494,13 +494,13 @@
                                 <span>Hotel & Kamar</span>
                             </a>
                         </li>
+                        <?php if (can_manage_agency()): ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/agency') ?>" class="nav-link <?= strpos(current_url(), 'owner/agency') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-person-badge-fill"></i>
                                 <span>Daftar Agensi</span>
                             </a>
                         </li>
-                        <?php if (is_owner()): ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/office-admin/create') ?>" class="nav-link <?= strpos(current_url(), 'office-admin') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-person-workspace"></i>
@@ -511,7 +511,8 @@
                     </ul>
                 </li>
 
-                <!-- Keuangan -->
+                <?php if (is_owner()): ?>
+                <!-- Keuangan (laporan + komisi — hanya pemilik) -->
                 <li class="nav-item">
                     <a href="#" class="nav-link nav-menu-parent" onclick="toggleSubmenu(event, 'keuangan')">
                         <i class="bi bi-wallet2"></i>
@@ -525,16 +526,15 @@
                                 <span>Laporan Bisnis</span>
                             </a>
                         </li>
-                        <?php if (can_view_commission()): ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/commissions') ?>" class="nav-link <?= strpos(current_url(), 'commissions') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-wallet2"></i>
                                 <span>Komisi Agensi</span>
                             </a>
                         </li>
-                        <?php endif; ?>
                     </ul>
                 </li>
+                <?php endif; ?>
 
                 <!-- Perlengkapan -->
                 <li class="nav-item">
