@@ -179,6 +179,7 @@
                                 <th>Status</th>
                                 <th>Catatan</th>
                                 <th class="pe-3 text-end">Bukti</th>
+                                <th class="pe-3 text-end">Kwitansi</th>
                             </tr>
                         </thead>
                         <tbody id="historyContent">
@@ -206,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = this.getAttribute('data-name');
             
             historyParticipantName.innerText = name;
-            historyContent.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary me-2"></div> Memuat data...</td></tr>';
+            historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary me-2"></div> Memuat data...</td></tr>';
             historyModal.show();
 
             fetch(`<?= base_url('owner/participant/payment-history') ?>/${id}`)
@@ -214,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(res => {
                     if (res.status === 'success') {
                         if (res.data.length === 0) {
-                            historyContent.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada riwayat pembayaran.</td></tr>';
+                            historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Belum ada riwayat pembayaran.</td></tr>';
                         } else {
                             let html = '';
                             res.data.forEach(item => {
@@ -226,6 +227,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 const formattedDate = new Date(item.payment_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
                                 const formattedAmount = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.amount);
 
+                                const receiptCell = item.status === 'verified'
+                                    ? `<a href="<?= base_url('owner/participant/transaction-receipt/') ?>${item.id}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-2" title="Cetak kwitansi"><i class="bi bi-printer"></i></a>`
+                                    : '<span class="text-muted small">—</span>';
+
                                 html += `
                                     <tr>
                                         <td class="ps-3 small fw-bold">${formattedDate}</td>
@@ -235,17 +240,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td class="pe-3 text-end">
                                             ${item.proof ? `<a href="<?= base_url() ?>${item.proof}" target="_blank" class="btn btn-light btn-sm rounded-pill px-2 border"><i class="bi bi-image"></i></a>` : '-'}
                                         </td>
+                                        <td class="pe-3 text-end">${receiptCell}</td>
                                     </tr>
                                 `;
                             });
                             historyContent.innerHTML = html;
                         }
                     } else {
-                        historyContent.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Gagal memuat data.</td></tr>';
+                        historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Gagal memuat data.</td></tr>';
                     }
                 })
                 .catch(err => {
-                    historyContent.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Terjadi kesalahan sistem.</td></tr>';
+                    historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Terjadi kesalahan sistem.</td></tr>';
                 });
         });
     });

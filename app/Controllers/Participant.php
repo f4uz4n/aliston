@@ -479,6 +479,12 @@ class Participant extends BaseController
         $h15_or_less = ($daysUntilDeparture !== null && $daysUntilDeparture <= 15);
         $can_boarding = ($participant['status'] !== 'cancelled' && $participant['status'] === 'verified' && $berkas_lengkap && $pembayaran_lunas && $h15_or_less);
 
+        $verifiedPayments = $paymentModel->where('participant_id', $id)
+            ->where('status', 'verified')
+            ->orderBy('payment_date', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->findAll();
+
         $data = [
             'participant' => $participant,
             'packages' => $packages,
@@ -492,6 +498,8 @@ class Participant extends BaseController
             'days_until_departure' => $daysUntilDeparture,
             'allow_ubah_jadwal_hotel' => $allow_ubah_jadwal_hotel,
             'can_boarding' => $can_boarding,
+            'verified_payments' => $verifiedPayments,
+            'pembayaran_lunas' => $pembayaran_lunas,
         ];
         return view('owner/participant/kelola', $data);
     }

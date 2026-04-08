@@ -5,6 +5,9 @@
 $allow = $allow_ubah_jadwal_hotel ?? false;
 $days = $days_until_departure ?? null;
 $isCancelled = ($participant['status'] ?? '') === 'cancelled';
+$verifiedPayments = $verified_payments ?? [];
+$pembayaranLunas = $pembayaran_lunas ?? false;
+$totalTargetKelola = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0);
 ?>
 <div class="row align-items-center mb-4">
     <div class="col-12 col-md-6">
@@ -113,6 +116,23 @@ $isCancelled = ($participant['status'] ?? '') === 'cancelled';
                                 </a>
                                 <?php if (is_owner()): ?>
                                 <a href="<?= base_url('owner/payment-verification?participant_id=' . (int)$participant['id'] . '&tab=pending') ?>" class="btn btn-outline-primary btn-sm rounded-pill">Verifikasi Pembayaran</a>
+                                <?php endif; ?>
+                                <?php if ($pembayaranLunas && $totalTargetKelola > 0): ?>
+                                <a href="<?= base_url('owner/participant/receipt/' . (int)$participant['id']) ?>" target="_blank" class="btn btn-outline-success btn-sm rounded-pill">
+                                    <i class="bi bi-printer me-1"></i> Cetak Kwitansi Lunas
+                                </a>
+                                <?php endif; ?>
+                                <?php if (!empty($verifiedPayments)): ?>
+                                <div class="text-end mt-1 pt-1 border-top w-100">
+                                    <span class="small text-secondary d-block mb-1">Kwitansi per setoran (sudah diverifikasi pemilik)</span>
+                                    <div class="d-flex flex-wrap gap-1 justify-content-end">
+                                        <?php foreach ($verifiedPayments as $vp): ?>
+                                        <a href="<?= base_url('owner/participant/transaction-receipt/' . (int)($vp['id'] ?? 0)) ?>" target="_blank" class="btn btn-light border btn-sm rounded-pill px-2 py-0" title="Cetak kwitansi">
+                                            <i class="bi bi-printer me-1"></i><?= date('d/m/y', strtotime($vp['payment_date'] ?? 'now')) ?> · Rp <?= number_format((float)($vp['amount'] ?? 0), 0, ',', '.') ?>
+                                        </a>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
                                 <?php endif; ?>
                                 <?php endif; ?>
                             </div>
