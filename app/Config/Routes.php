@@ -19,7 +19,6 @@ $routes->get('logout', 'Auth::logout');
 
 $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($routes) {
     $routes->get('/', 'Owner::index');
-    $routes->get('notifications', 'Owner::getNotifications');
 
     // Materials Management (Promotion Materials)
     $routes->group('materials', function ($routes) {
@@ -74,7 +73,6 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
             $routes->get('documents', 'Participant::documents');
             $routes->get('documents/(:num)', 'Participant::documents/$1');
             $routes->post('update-checklist', 'Participant::updateChecklist');
-            $routes->post('verify-document', 'Participant::verifyDocument');
             $routes->post('upload-document', 'Participant::uploadDocument');
             $routes->get('receipt/(:num)', 'Participant::receipt/$1');
             $routes->get('registration-form/(:num)', 'Participant::registrationFormPrint/$1');
@@ -88,8 +86,6 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
             $routes->get('boarding-list', 'Participant::boardingList');
             $routes->get('boarding-list-print', 'Participant::boardingListPrint');
             $routes->get('boarding-list-export', 'Participant::boardingListExport');
-            $routes->post('process-boarding', 'Participant::processBoarding');
-            $routes->post('confirm-boarding', 'Participant::confirmBoarding');
             $routes->get('boarding-manifest/(:num)', 'Participant::boardingManifest/$1');
 
             // Pembatalan
@@ -118,7 +114,6 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
         $routes->post('tabungan/store-deposit', 'Tabungan::storeDeposit');
         $routes->get('tabungan/claim/(:num)', 'Tabungan::claimForm/$1');
         $routes->post('tabungan/do-claim', 'Tabungan::doClaim');
-        $routes->post('tabungan/verify-deposit/(:num)', 'Tabungan::verifyDeposit/$1');
         $routes->get('tabungan/edit/(:num)', 'Tabungan::edit/$1');
         $routes->post('tabungan/update/(:num)', 'Tabungan::update/$1');
         $routes->post('tabungan/delete/(:num)', 'Tabungan::delete/$1');
@@ -130,22 +125,9 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
         // Account Settings
         $routes->get('settings', 'Owner::settings');
         $routes->post('update-settings', 'Owner::updateSettings');
-        $routes->get('payment-verification', 'Owner::paymentVerification');
-        $routes->post('verify-payment', 'Owner::verifyPayment');
-        $routes->get('payment-verification/edit-payment/(:num)', 'Owner::editPayment/$1');
-        $routes->post('payment-verification/update-payment/(:num)', 'Owner::updatePayment/$1');
-        $routes->post('payment-verification/delete-payment/(:num)', 'Owner::deletePayment/$1');
 
         // Participant Verification & Checklist
         $routes->get('checklist/(:num)', 'Owner::checklist/$1');
-        $routes->post('verify-participant', 'Owner::verifyParticipant');
-
-        // Testimoni Jamaah (verifikasi)
-        $routes->get('testimoni', 'Owner::testimoni');
-        $routes->get('testimoni/edit/(:num)', 'Owner::editTestimoni/$1');
-        $routes->post('testimoni/update/(:num)', 'Owner::updateTestimoni/$1');
-        $routes->post('testimoni/delete/(:num)', 'Owner::deleteTestimoni/$1');
-        $routes->post('testimoni/verify/(:num)', 'Owner::verifyTestimoni/$1');
 
         // Banner (slider halaman login)
         $routes->get('banners', 'Owner::banners');
@@ -172,6 +154,24 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
 
 // Agensi, pembuatan admin kantor, laporan bisnis (berisi data agensi): hanya pemilik
 $routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
+    // Notifikasi verifikasi & semua aksi verifikasi: hanya pemilik
+    $routes->get('notifications', 'Owner::getNotifications');
+    $routes->get('payment-verification', 'Owner::paymentVerification');
+    $routes->post('verify-payment', 'Owner::verifyPayment');
+    $routes->get('payment-verification/edit-payment/(:num)', 'Owner::editPayment/$1');
+    $routes->post('payment-verification/update-payment/(:num)', 'Owner::updatePayment/$1');
+    $routes->post('payment-verification/delete-payment/(:num)', 'Owner::deletePayment/$1');
+    $routes->post('verify-participant', 'Owner::verifyParticipant');
+    $routes->post('participant/verify-document', 'Participant::verifyDocument');
+    $routes->post('participant/process-boarding', 'Participant::processBoarding');
+    $routes->post('participant/confirm-boarding', 'Participant::confirmBoarding');
+    $routes->post('tabungan/verify-deposit/(:num)', 'Tabungan::verifyDeposit/$1');
+    $routes->get('testimoni', 'Owner::testimoni');
+    $routes->get('testimoni/edit/(:num)', 'Owner::editTestimoni/$1');
+    $routes->post('testimoni/update/(:num)', 'Owner::updateTestimoni/$1');
+    $routes->post('testimoni/delete/(:num)', 'Owner::deleteTestimoni/$1');
+    $routes->post('testimoni/verify/(:num)', 'Owner::verifyTestimoni/$1');
+
     $routes->group('agency', function ($routes) {
         $routes->get('/', 'AgencyAdmin::index');
         $routes->get('create', 'AgencyAdmin::create');

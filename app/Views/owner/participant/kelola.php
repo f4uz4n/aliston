@@ -19,7 +19,7 @@ $isCancelled = ($participant['status'] ?? '') === 'cancelled';
         $canBoard = $can_boarding ?? false;
         $isBoard = !empty($participant['is_boarded']);
         ?>
-        <?php if ($canBoard && !$isBoard): ?>
+        <?php if (is_owner() && $canBoard && !$isBoard): ?>
         <form action="<?= base_url('owner/participant/confirm-boarding') ?>" method="post" class="d-inline-block me-2">
             <?= csrf_field() ?>
             <input type="hidden" name="participant_id" value="<?= $participant['id'] ?>">
@@ -81,9 +81,15 @@ $isCancelled = ($participant['status'] ?? '') === 'cancelled';
                                     </button>
                                 </form>
                                 <?php else: ?>
+                                <?php if (is_owner()): ?>
                                 <a href="<?= base_url('owner/checklist/' . $participant['id']) ?>" class="btn btn-outline-success btn-sm rounded-pill">
                                     <i class="bi bi-patch-check me-1"></i> Verifikasi Jamaah
                                 </a>
+                                <?php else: ?>
+                                <a href="<?= base_url('owner/checklist/' . $participant['id']) ?>" class="btn btn-outline-secondary btn-sm rounded-pill">
+                                    <i class="bi bi-clipboard-check me-1"></i> Cek Kelengkapan
+                                </a>
+                                <?php endif; ?>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -105,7 +111,9 @@ $isCancelled = ($participant['status'] ?? '') === 'cancelled';
                                 <a href="<?= base_url('owner/participant/add-payment/' . $participant['id']) ?>" class="btn btn-primary btn-sm rounded-pill">
                                     <i class="bi bi-plus-circle me-1"></i> Tambah Pembayaran (Kantor)
                                 </a>
+                                <?php if (is_owner()): ?>
                                 <a href="<?= base_url('owner/payment-verification?participant_id=' . (int)$participant['id'] . '&tab=pending') ?>" class="btn btn-outline-primary btn-sm rounded-pill">Verifikasi Pembayaran</a>
+                                <?php endif; ?>
                                 <?php endif; ?>
                             </div>
                         </div>

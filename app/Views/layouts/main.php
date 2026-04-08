@@ -453,12 +453,14 @@
                                 <span>Kelengkapan Berkas</span>
                             </a>
                         </li>
+                        <?php if (is_owner()): ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/payment-verification') ?>" class="nav-link <?= strpos(current_url(), 'payment-verification') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-check-circle-fill"></i>
                                 <span>Verifikasi Pembayaran</span>
                             </a>
                         </li>
+                        <?php endif; ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/participant/cancellations') ?>" class="nav-link <?= strpos(current_url(), 'cancellations') !== false || strpos(current_url(), 'cancel-form') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-x-circle-fill"></i>
@@ -573,12 +575,14 @@
                                 <span>Banner Beranda</span>
                             </a>
                         </li>
+                        <?php if (is_owner()): ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/testimoni') ?>" class="nav-link <?= strpos(current_url(), 'owner/testimoni') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-chat-quote"></i>
                                 <span>Testimoni Jamaah</span>
                             </a>
                         </li>
+                        <?php endif; ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/settings') ?>" class="nav-link <?= strpos(current_url(), 'settings') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-gear-fill"></i>
@@ -729,8 +733,8 @@
         </button>
 
         <div class="d-flex align-items-center gap-2">
-            <?php if (is_back_office()): ?>
-            <!-- Notifikasi -->
+            <?php if (is_owner()): ?>
+            <!-- Notifikasi verifikasi (hanya pemilik) -->
             <div class="dropdown" id="notificationDropdown">
                 <button class="btn btn-light rounded-circle p-2 position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificationBtn" style="width: 40px; height: 40px;">
                     <i class="bi bi-bell fs-5" id="notificationIcon"></i>
@@ -884,9 +888,9 @@
             });
         });
 
-        <?php if (is_back_office()): ?>
+        <?php if (is_owner()): ?>
 
-        // Load Notifikasi
+        // Load Notifikasi (pemilik saja)
         (function() {
             var badge = document.getElementById('notificationBadge');
             var items = document.getElementById('notificationItems');

@@ -128,6 +128,7 @@
                                     <td class="pe-4 text-end">
                                         <div class="d-flex justify-content-end gap-2">
                                             <a href="<?= base_url($doc['file_path']) ?>" target="_blank" class="btn btn-light btn-sm rounded-pill px-3 border shadow-sm"><i class="bi bi-eye"></i></a>
+                                            <?php if (is_owner()): ?>
                                             <form action="<?= base_url('owner/participant/verify-document') ?>" method="post" class="d-inline">
                                                 <?= csrf_field() ?>
                                                 <input type="hidden" name="id" value="<?= $doc['id'] ?>">
@@ -136,6 +137,7 @@
                                                     <?= $doc['is_verified'] ? 'Unverify' : 'Verify' ?>
                                                 </button>
                                             </form>
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>

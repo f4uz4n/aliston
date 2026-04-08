@@ -58,10 +58,14 @@
                                 <span class="small"><?= date('d/m/Y', strtotime($d['payment_date'])) ?></span>
                                 <strong class="d-block">Rp <?= number_format($d['amount'], 0, ',', '.') ?></strong>
                                 <?php if (($d['status'] ?? 'verified') === 'pending'): ?>
+                                    <?php if (is_owner()): ?>
                                     <form action="<?= base_url('owner/tabungan/verify-deposit/'.$d['id']) ?>" method="post" class="mt-1">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-success btn-sm rounded-pill">Verifikasi</button>
                                     </form>
+                                    <?php else: ?>
+                                    <span class="badge bg-warning text-dark small mt-1 d-inline-block">Menunggu verifikasi pemilik</span>
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <span class="badge bg-success bg-opacity-10 text-success small">Terverifikasi</span>
                                 <?php endif; ?>

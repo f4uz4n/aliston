@@ -98,7 +98,7 @@
                         <?php endif; ?>
                     </td>
                     <td class="text-end">
-                        <?php if (empty($p['is_boarded'])): ?>
+                        <?php if (empty($p['is_boarded']) && is_owner()): ?>
                         <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="openBoardingModal(<?= htmlspecialchars(json_encode([
                             'id' => $p['id'],
                             'name' => $p['name'],
@@ -114,6 +114,8 @@
                         ])) ?>)">
                             <i class="bi bi-airplane-engines me-1"></i> Boarding
                         </button>
+                        <?php elseif (empty($p['is_boarded'])): ?>
+                        <span class="text-muted small">Hanya pemilik</span>
                         <?php else: ?>
                         <span class="text-muted small">—</span>
                         <?php endif; ?>

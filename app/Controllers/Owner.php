@@ -525,9 +525,11 @@ class Owner extends BaseController
             'doc_progress' => $doc_progress,
             'verified_count' => $verified_count,
             'total_goal' => $total_goal,
-            'is_owner' => true
+            'is_owner' => is_owner(),
         ]);
-    }    public function settings()
+    }
+
+    public function settings()
     {
         $userModel = new \App\Models\UserModel();
         $data = [
@@ -773,7 +775,7 @@ class Owner extends BaseController
      */
     public function getNotifications()
     {
-        if (! is_back_office()) {
+        if (! is_owner()) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
