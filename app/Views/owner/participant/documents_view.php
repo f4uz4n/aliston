@@ -126,8 +126,21 @@
                                         <?php endif; ?>
                                     </td>
                                     <td class="pe-4 text-end">
-                                        <div class="d-flex justify-content-end gap-2">
+                                        <div class="d-flex justify-content-end flex-wrap gap-1">
                                             <a href="<?= base_url($doc['file_path']) ?>" target="_blank" class="btn btn-light btn-sm rounded-pill px-3 border shadow-sm"><i class="bi bi-eye"></i></a>
+                                            <?php if (is_back_office()): ?>
+                                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 btn-edit-owner-doc" data-bs-toggle="modal" data-bs-target="#editOwnerDocModal"
+                                                data-doc-id="<?= (int)($doc['id'] ?? 0) ?>"
+                                                data-doc-type="<?= esc($doc['type'] ?? 'other', 'attr') ?>"
+                                                data-doc-title="<?= esc($doc['title'] ?? '', 'attr') ?>">
+                                                <i class="bi bi-pencil-square"></i> Edit
+                                            </button>
+                                            <form action="<?= base_url('owner/participant/delete-document') ?>" method="post" class="d-inline" onsubmit="return confirm('Hapus berkas ini secara permanen?');">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="id" value="<?= (int)($doc['id'] ?? 0) ?>">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3"><i class="bi bi-trash"></i> Hapus</button>
+                                            </form>
+                                            <?php endif; ?>
                                             <?php if (is_owner()): ?>
                                             <form action="<?= base_url('owner/participant/verify-document') ?>" method="post" class="d-inline">
                                                 <?= csrf_field() ?>
@@ -147,6 +160,55 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Berkas (agen kantor & pemilik) -->
+<div class="modal fade" id="editOwnerDocModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Edit Berkas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<?= base_url('owner/participant/update-document') ?>" method="post" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="document_id" id="owner_edit_document_id" value="">
+                <input type="hidden" name="participant_id" value="<?= (int)($participant['id'] ?? 0) ?>">
+                <div class="modal-body py-3">
+                    <p class="small text-secondary mb-3">Mengganti jenis, keterangan, atau file mengatur ulang status verifikasi menjadi menunggu.</p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Jenis berkas</label>
+                        <select name="type" id="owner_edit_type" class="form-select bg-light border-0" required>
+                            <option value="passport">Paspor</option>
+                            <option value="id_card">KTP</option>
+                            <option value="kk">KK</option>
+                            <option value="vaccine">Dokumen pendukung</option>
+                            <option value="visa">Visa</option>
+                            <option value="vaccine_meningitis">Vaksin Meningitis</option>
+                            <option value="vaccine_covid">Vaksin Covid</option>
+                            <option value="insurance">Asuransi</option>
+                            <option value="ticket">Tiket</option>
+                            <option value="photo">Pas Foto 4x6</option>
+                            <option value="other">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Keterangan (opsional)</label>
+                        <input type="text" name="title" id="owner_edit_title" class="form-control bg-light border-0" placeholder="Contoh: Visa Saudi">
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold text-secondary">Ganti file (opsional)</label>
+                        <input type="file" name="file" id="owner_edit_file" class="form-control bg-light border-0" accept=".pdf,image/*">
+                        <small class="text-muted">Kosongkan jika hanya mengubah jenis atau keterangan.</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -207,6 +269,22 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-edit-owner-doc').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var idEl = document.getElementById('owner_edit_document_id');
+            var typeEl = document.getElementById('owner_edit_type');
+            var titleEl = document.getElementById('owner_edit_title');
+            var fileEl = document.getElementById('owner_edit_file');
+            if (idEl) idEl.value = this.getAttribute('data-doc-id') || '';
+            if (typeEl) {
+                var t = this.getAttribute('data-doc-type') || 'other';
+                typeEl.value = typeEl.querySelector('option[value="' + t + '"]') ? t : 'other';
+            }
+            if (titleEl) titleEl.value = this.getAttribute('data-doc-title') || '';
+            if (fileEl) fileEl.value = '';
+        });
+    });
+
     const btnAddUpload = document.getElementById('btnAddUpload');
     const uploadContainer = document.getElementById('uploadContainer');
     

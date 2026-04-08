@@ -74,6 +74,8 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
             $routes->get('documents/(:num)', 'Participant::documents/$1');
             $routes->post('update-checklist', 'Participant::updateChecklist');
             $routes->post('upload-document', 'Participant::uploadDocument');
+            $routes->post('delete-document', 'Participant::deleteDocument');
+            $routes->post('update-document', 'Participant::updateDocument');
             $routes->get('receipt/(:num)', 'Participant::receipt/$1');
             $routes->get('registration-form/(:num)', 'Participant::registrationFormPrint/$1');
             $routes->get('transaction-receipt/(:num)', 'Participant::transactionReceipt/$1');
@@ -226,6 +228,8 @@ $routes->group('agency', ['filter' => 'auth:agency'], function ($routes) {
     $routes->get('documents/(:num)', 'Agency::documents/$1');
     $routes->post('update-documents', 'Agency::updateDocuments');
     $routes->post('upload-document', 'Agency::uploadDocument');
+    $routes->post('delete-document', 'Agency::deleteDocument');
+    $routes->post('update-document', 'Agency::updateDocument');
 
     // Payment Installments
     $routes->get('payments', 'Agency::payments');

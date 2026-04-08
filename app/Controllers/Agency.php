@@ -1127,6 +1127,95 @@ class Agency extends BaseController
     }
 
     /**
+     * Hapus satu berkas digital (hanya jamaah agensi ini).
+     */
+    public function deleteDocument()
+    {
+        $docId = (int) $this->request->getPost('id');
+        $docModel = new \App\Models\DocumentModel();
+        $doc = $docModel->find($docId);
+        if (!$doc) {
+            return redirect()->back()->with('error', 'Berkas tidak ditemukan.');
+        }
+
+        $participantModel = new \App\Models\ParticipantModel();
+        $participant = $participantModel->find($doc['participant_id']);
+        if (!$participant || (int) $participant['agency_id'] !== (int) session()->get('id')) {
+            return redirect()->to('agency/participants')->with('error', 'Akses ditolak.');
+        }
+
+        if (!empty($doc['file_path']) && is_file(ROOTPATH . 'public/' . $doc['file_path'])) {
+            @unlink(ROOTPATH . 'public/' . $doc['file_path']);
+        }
+        $docModel->delete($docId);
+
+        return redirect()->back()->with('msg', 'Berkas berhasil dihapus.');
+    }
+
+    /**
+     * Ganti file dan/atau jenis/keterangan berkas (status verifikasi direset).
+     */
+    public function updateDocument()
+    {
+        $docId = (int) $this->request->getPost('document_id');
+        $participantId = (int) $this->request->getPost('participant_id');
+        $participantModel = new \App\Models\ParticipantModel();
+        $participant = $participantModel->find($participantId);
+        if (!$participant || (int) $participant['agency_id'] !== (int) session()->get('id')) {
+            return redirect()->to('agency/participants')->with('error', 'Akses ditolak.');
+        }
+
+        $docModel = new \App\Models\DocumentModel();
+        $doc = $docModel->find($docId);
+        if (!$doc || (int) $doc['participant_id'] !== $participantId) {
+            return redirect()->back()->with('error', 'Berkas tidak ditemukan.');
+        }
+
+        $rawType = (string) $this->request->getPost('type');
+        $titleInput = trim((string) $this->request->getPost('title'));
+        $typeLabels = [
+            'passport' => 'Paspor', 'id_card' => 'KTP', 'kk' => 'KK', 'vaccine' => 'Dokumen pendukung (akta lahir/ijazah/buku nikah)',
+            'visa' => 'Visa', 'vaccine_meningitis' => 'Vaksin Meningitis', 'vaccine_covid' => 'Vaksin Covid',
+            'insurance' => 'Asuransi', 'ticket' => 'Tiket', 'photo' => 'Pas Foto 4x6', 'other' => 'Lainnya',
+        ];
+        $singleTypes = ['passport', 'id_card', 'kk', 'vaccine'];
+        $dbType = in_array($rawType, $singleTypes, true) ? $rawType : 'other';
+        $label = $titleInput !== '' ? $titleInput : ($typeLabels[$rawType] ?? $rawType);
+
+        $file = $this->request->getFile('file');
+        $hasNewFile = $file && $file->isValid() && !$file->hasMoved();
+
+        if (in_array($dbType, $singleTypes, true)) {
+            $dupes = $docModel->where('participant_id', $participantId)->where('type', $dbType)->where('id !=', $docId)->findAll();
+            foreach ($dupes as $d) {
+                if (!empty($d['file_path']) && is_file(ROOTPATH . 'public/' . $d['file_path'])) {
+                    @unlink(ROOTPATH . 'public/' . $d['file_path']);
+                }
+                $docModel->delete($d['id']);
+            }
+        }
+
+        $update = [
+            'type' => $dbType,
+            'title' => $label,
+            'is_verified' => 0,
+        ];
+
+        if ($hasNewFile) {
+            if (!empty($doc['file_path']) && is_file(ROOTPATH . 'public/' . $doc['file_path'])) {
+                @unlink(ROOTPATH . 'public/' . $doc['file_path']);
+            }
+            $newName = $file->getRandomName();
+            $file->move(ROOTPATH . 'public/uploads/documents', $newName);
+            $update['file_path'] = 'uploads/documents/' . $newName;
+        }
+
+        $docModel->update($docId, $update);
+
+        return redirect()->to('agency/documents/' . $participantId)->with('msg', 'Berkas berhasil diperbarui.');
+    }
+
+    /**
      * Simpan/update berkas (paspor, KTP, vaksin) dari form melengkapi berkas.
      */
     public function updateDocuments()
