@@ -13,7 +13,7 @@ class ParticipantModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'package_id', 'agency_id', 'nik', 'name', 'place_of_birth',
+        'package_id', 'departure_note', 'agency_id', 'nik', 'name', 'place_of_birth',
         'date_of_birth', 'gender', 'address', 'rt_rw', 'kelurahan',
         'kecamatan', 'kabupaten', 'provinsi', 'religion',
         'marital_status', 'occupation', 'blood_type', 'nationality',

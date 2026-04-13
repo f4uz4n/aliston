@@ -150,7 +150,12 @@ $totalTargetKelola = (float)($participant['package_price'] ?? 0) + (float)($part
                 <h6 class="mb-0 fw-bold"><i class="bi bi-calendar-event me-2"></i>Ganti Jadwal Pemberangkatan</h6>
             </div>
             <div class="card-body">
-                <p class="small text-secondary mb-3">Jadwal saat ini: <strong><?= esc($participant['package_name']) ?></strong> (<?= $participant['package_departure_date'] ? date('d/m/Y', strtotime($participant['package_departure_date'])) : '—' ?>)</p>
+                <p class="small text-secondary mb-2">Jadwal saat ini: <strong><?= esc($participant['package_name']) ?></strong> (<?= $participant['package_departure_date'] ? date('d/m/Y', strtotime($participant['package_departure_date'])) : '—' ?>)</p>
+                <?php if (!empty($participant['departure_note'])): ?>
+                <p class="small text-dark mb-3 p-2 rounded-3 bg-light border border-dashed"><span class="text-secondary">Catatan tanggal berangkat:</span> <?= esc($participant['departure_note']) ?></p>
+                <?php else: ?>
+                <p class="small text-muted mb-3">Belum ada catatan tanggal berangkat tambahan.</p>
+                <?php endif; ?>
                 <?php if ($allow): ?>
                 <form action="<?= base_url('owner/participant/update-schedule') ?>" method="post">
                     <?= csrf_field() ?>
@@ -164,6 +169,11 @@ $totalTargetKelola = (float)($participant['package_price'] ?? 0) + (float)($part
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Catatan tanggal pemberangkatan <span class="text-muted fw-normal">(opsional)</span></label>
+                        <input type="text" name="departure_note" class="form-control" maxlength="500" value="<?= esc(old('departure_note', $participant['departure_note'] ?? '')) ?>" placeholder="Contoh: 15 Mei 2026, atau penyesuaian dengan maskapai">
+                        <div class="form-text">Teks bebas untuk catatan tanggal/estimasi berangkat. Kosongkan untuk menghapus catatan.</div>
                     </div>
                     <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-check2 me-1"></i> Simpan Jadwal</button>
                 </form>

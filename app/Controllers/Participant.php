@@ -778,7 +778,13 @@ class Participant extends BaseController
         if (!$check['allowed']) {
             return redirect()->back()->with('error', $check['message']);
         }
-        $this->participantModel->update($participantId, ['package_id' => $packageId]);
+        $noteRaw = $this->request->getPost('departure_note');
+        $note = $noteRaw !== null && $noteRaw !== '' ? trim((string) $noteRaw) : '';
+        $update = [
+            'package_id' => (int) $packageId,
+            'departure_note' => $note !== '' ? $note : null,
+        ];
+        $this->participantModel->update($participantId, $update);
         return redirect()->back()->with('msg', 'Jadwal pemberangkatan berhasil diubah.');
     }
 
