@@ -4,7 +4,7 @@
 <div class="row align-items-center mb-4">
     <div class="col-12 col-md-6">
         <h2 class="fw-800 text-dark mb-1">Boarding</h2>
-        <p class="text-secondary mb-0">Daftar jamaah untuk keberangkatan. Berkas lengkap, pembayaran lunas, dan H-15.</p>
+        <p class="text-secondary mb-0">Hanya jamaah terverifikasi. Berkas lengkap, pembayaran lunas, dan H-15.</p>
     </div>
 </div>
 

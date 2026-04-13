@@ -913,11 +913,12 @@ class Participant extends BaseController
                 $this->participantModel->set('is_boarded', 1)
                     ->set('boarded_at', date('Y-m-d H:i:s'))
                     ->whereIn('id', $participantIds)
+                    ->where('status', 'verified')
                     ->update();
             }
 
-            // 2. Mark unselected (in this package) as not boarded
-            $allInPackage = $this->participantModel->where('package_id', $packageId)->findColumn('id') ?? [];
+            // 2. Mark unselected (jamaah terverifikasi di paket ini) as not boarded
+            $allInPackage = $this->participantModel->where('package_id', $packageId)->where('status', 'verified')->findColumn('id') ?? [];
             $idsToKeep = $participantIds ?? [];
             $idsToReset = array_diff($allInPackage, $idsToKeep);
 
@@ -949,6 +950,9 @@ class Participant extends BaseController
             ->first();
         if (!$participant || $participant['status'] === 'cancelled') {
             return redirect()->back()->with('error', 'Jamaah tidak ditemukan atau sudah dibatalkan.');
+        }
+        if ($participant['status'] !== 'verified') {
+            return redirect()->back()->with('error', 'Boarding hanya untuk jamaah yang sudah terverifikasi.');
         }
         $stats = $this->getDocStats($participantId);
         $paymentModel = new PaymentModel();
@@ -987,7 +991,7 @@ class Participant extends BaseController
             ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date as package_departure_date, travel_packages.airline, travel_packages.price as package_price, users.full_name as agency_name')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->join('users', 'users.id = participants.agency_id')
-            ->where('participants.status !=', 'cancelled')
+            ->where('participants.status', 'verified')
             ->orderBy('travel_packages.departure_date', 'ASC')
             ->orderBy('participants.name', 'ASC');
 
@@ -1015,7 +1019,7 @@ class Participant extends BaseController
             $eff = participant_effective_departure($p['package_departure_date'] ?? null, $p['departure_note'] ?? null);
             $p['days_until'] = participant_days_until_departure($eff);
             $p['boarding_departure_label'] = $eff ? date('d/m/Y H:i', strtotime($eff)) : '—';
-            $p['can_boarding'] = ($p['status'] === 'verified' && $p['berkas_lengkap'] && $p['pembayaran_lunas'] && $p['days_until'] !== null && $p['days_until'] <= 15);
+            $p['can_boarding'] = ($p['berkas_lengkap'] && $p['pembayaran_lunas'] && $p['days_until'] !== null && $p['days_until'] <= 15);
         }
         unset($p);
 
@@ -1045,7 +1049,7 @@ class Participant extends BaseController
             ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date as package_departure_date, travel_packages.airline, users.full_name as agency_name')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->join('users', 'users.id = participants.agency_id')
-            ->where('participants.status !=', 'cancelled')
+            ->where('participants.status', 'verified')
             ->orderBy('travel_packages.departure_date', 'ASC')
             ->orderBy('participants.name', 'ASC');
 
@@ -1097,7 +1101,7 @@ class Participant extends BaseController
             ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date as package_departure_date, travel_packages.airline, users.full_name as agency_name')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->join('users', 'users.id = participants.agency_id')
-            ->where('participants.status !=', 'cancelled')
+            ->where('participants.status', 'verified')
             ->orderBy('travel_packages.departure_date', 'ASC')
             ->orderBy('participants.name', 'ASC');
 
@@ -1160,6 +1164,7 @@ class Participant extends BaseController
             ->join('travel_hotel_rooms', 'travel_hotel_rooms.id = participants.room_upgrade_id', 'left')
             ->select('participants.*, travel_hotels.name as hotel_name, travel_hotel_rooms.name as room_name, travel_hotel_rooms.type as room_type')
             ->where('participants.package_id', $packageId)
+            ->where('participants.status', 'verified')
             ->where('participants.is_boarded', 1)
             ->orderBy('participants.name', 'ASC')
             ->findAll();

@@ -4,7 +4,7 @@
 <div class="row align-items-center mb-4">
     <div class="col-12 col-md-6">
         <h2 class="fw-800 text-dark mb-1">Boarding</h2>
-        <p class="text-secondary mb-0">Verifikasi keseluruhan jamaah sebelum keberangkatan. Berkas lengkap, pembayaran lunas, dan H-15.</p>
+        <p class="text-secondary mb-0">Hanya jamaah terverifikasi. Syarat boarding: berkas lengkap, pembayaran lunas, dan H-15.</p>
     </div>
     <div class="col-12 col-md-6 text-md-end">
         <?php if (session()->getFlashdata('msg')): ?>

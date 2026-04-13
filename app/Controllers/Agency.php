@@ -1361,7 +1361,7 @@ class Agency extends BaseController
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->join('users', 'users.id = participants.agency_id')
             ->where('participants.agency_id', $agencyId)
-            ->where('participants.status !=', 'cancelled')
+            ->where('participants.status', 'verified')
             ->orderBy('travel_packages.departure_date', 'ASC')
             ->orderBy('participants.name', 'ASC');
 
@@ -1391,7 +1391,7 @@ class Agency extends BaseController
             if ($dep) {
                 $p['days_until'] = (int) floor((strtotime(date('Y-m-d', strtotime($dep))) - strtotime(date('Y-m-d'))) / 86400);
             }
-            $p['can_boarding'] = ($p['status'] === 'verified' && $p['berkas_lengkap'] && $p['pembayaran_lunas'] && $p['days_until'] !== null && $p['days_until'] <= 15);
+            $p['can_boarding'] = ($p['berkas_lengkap'] && $p['pembayaran_lunas'] && $p['days_until'] !== null && $p['days_until'] <= 15);
         }
 
         $data = [
