@@ -136,8 +136,10 @@ class Equipment extends BaseController
             ->where('participants.id', $participantId)
             ->get()->getRowArray();
 
-        if (!$participant)
+        if (!$participant) {
             return redirect()->to('owner/equipment/participants')->with('error', 'Jamaah tidak ditemukan.');
+        }
+        $participant = format_participant_name_row($participant);
 
         // Get active master items
         $masterItems = $this->masterModel->getActive();

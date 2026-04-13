@@ -19,3 +19,22 @@ if (! function_exists('format_nama_jamaah')) {
             : strtoupper($t);
     }
 }
+
+if (! function_exists('format_participant_name_row')) {
+    /**
+     * Terapkan format nama jamaah pada satu baris hasil query (mis. getRowArray).
+     *
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    function format_participant_name_row(array $row): array
+    {
+        foreach (['name', 'passport_full_name', 'passport_name_idn', 'emergency_name'] as $field) {
+            if (isset($row[$field]) && is_string($row[$field]) && $row[$field] !== '') {
+                $row[$field] = format_nama_jamaah($row[$field]);
+            }
+        }
+
+        return $row;
+    }
+}

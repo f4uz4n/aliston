@@ -100,13 +100,7 @@ class ParticipantModel extends Model
      */
     private function applyJamaahNameFormatting(array $row): array
     {
-        foreach (['name', 'passport_full_name', 'passport_name_idn', 'emergency_name'] as $field) {
-            if (isset($row[$field]) && is_string($row[$field]) && $row[$field] !== '') {
-                $row[$field] = format_nama_jamaah($row[$field]);
-            }
-        }
-
-        return $row;
+        return format_participant_name_row($row);
     }
 
     public function getParticipantBuilder()

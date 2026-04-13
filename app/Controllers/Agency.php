@@ -709,6 +709,7 @@ class Agency extends BaseController
         if (!$participant || $participant['agency_id'] != session()->get('id')) {
             return redirect()->to('agency/payments')->with('error', 'Jamaah tidak ditemukan.');
         }
+        $participant = format_participant_name_row($participant);
 
         $paymentModel = new \App\Models\PaymentModel();
         $payments = $paymentModel->where('participant_id', $participant_id)
@@ -750,6 +751,7 @@ class Agency extends BaseController
         if (!$participant || $participant['agency_id'] != session()->get('id')) {
             return redirect()->to('agency/payments')->with('error', 'Jamaah tidak ditemukan.');
         }
+        $participant = format_participant_name_row($participant);
 
         $userModel = new \App\Models\UserModel();
         $owner = $userModel->where('role', 'owner')->first();

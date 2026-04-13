@@ -334,6 +334,7 @@ class Participant extends BaseController
         if (!$participant) {
             return redirect()->back()->with('error', 'Jamaah tidak ditemukan.');
         }
+        $participant = format_participant_name_row($participant);
 
         $paymentModel = new PaymentModel();
         $payments = $paymentModel->where('participant_id', $id)
@@ -489,6 +490,7 @@ class Participant extends BaseController
         if (!$participant) {
             return redirect()->back()->with('error', 'Jamaah tidak ditemukan.');
         }
+        $participant = format_participant_name_row($participant);
 
         $userModel = new UserModel();
         $owner = $userModel->where('role', 'owner')->first();
