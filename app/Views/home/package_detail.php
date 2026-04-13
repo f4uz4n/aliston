@@ -12,19 +12,26 @@ $bulanMapPamphlet = [
     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
 ];
 $departurePamphletLabel = date('d M Y', strtotime($package['departure_date'] ?? 'now'));
-if (!empty($package['show_departure_month_year_only'])) {
-    $monthsCsv = (string) ($package['pamphlet_departure_months'] ?? '');
-    $yearPamphlet = trim((string) ($package['pamphlet_departure_year'] ?? ''));
-    $monthNames = [];
-    if ($monthsCsv !== '') {
-        foreach (explode(',', $monthsCsv) as $m) {
-            $mi = (int) trim($m);
-            if (isset($bulanMapPamphlet[$mi])) {
-                $monthNames[] = $bulanMapPamphlet[$mi];
-            }
+$departureMonthsOnlyLabel = '';
+$monthsCsv = (string) ($package['pamphlet_departure_months'] ?? '');
+$yearPamphlet = trim((string) ($package['pamphlet_departure_year'] ?? ''));
+$monthNames = [];
+if ($monthsCsv !== '') {
+    foreach (explode(',', $monthsCsv) as $m) {
+        $mi = (int) trim($m);
+        if (isset($bulanMapPamphlet[$mi])) {
+            $monthNames[] = $bulanMapPamphlet[$mi];
         }
-        $monthNames = array_values(array_unique($monthNames));
     }
+    $monthNames = array_values(array_unique($monthNames));
+}
+if (!empty($monthNames)) {
+    $departureMonthsOnlyLabel = implode(', ', $monthNames);
+    if (preg_match('/^\d{4}$/', $yearPamphlet) === 1) {
+        $departureMonthsOnlyLabel .= ' ' . $yearPamphlet;
+    }
+}
+if (!empty($package['show_departure_month_year_only'])) {
     if (!empty($monthNames) && preg_match('/^\d{4}$/', $yearPamphlet) === 1) {
         $departurePamphletLabel = implode(', ', $monthNames) . ' ' . $yearPamphlet;
     } else {
@@ -57,6 +64,13 @@ if (!empty($package['show_departure_month_year_only'])) {
                     <?php endif; ?>
                     <div class="card-body p-4 p-md-5">
                         <h1 class="section-title h3 mb-4"><?= esc($package['name']) ?></h1>
+                        <?php if (!empty($package['image']) && is_file(FCPATH . $package['image'])): ?>
+                        <div class="mb-4">
+                            <a href="<?= base_url($package['image']) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary rounded-pill px-4">
+                                <i class="bi bi-image me-1"></i> Lihat Pamflet
+                            </a>
+                        </div>
+                        <?php endif; ?>
                         <div class="row g-3 mb-4">
                             <div class="col-6 col-md-3">
                                 <div class="text-center p-3 rounded-4 bg-light border">
@@ -87,6 +101,15 @@ if (!empty($package['show_departure_month_year_only'])) {
                                 </div>
                             </div>
                         </div>
+                        <?php if ($departureMonthsOnlyLabel !== ''): ?>
+                        <div class="alert alert-light border rounded-4 d-flex align-items-start gap-3 mb-4">
+                            <i class="bi bi-calendar3 text-danger fs-4 mt-1"></i>
+                            <div>
+                                <div class="fw-bold text-dark">Daftar Bulan Keberangkatan</div>
+                                <div class="text-danger fw-bold"><?= esc($departureMonthsOnlyLabel) ?></div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
 
                         <div class="row g-4">
                             <div class="col-md-6 border-end">
