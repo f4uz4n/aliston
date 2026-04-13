@@ -6,6 +6,32 @@ $package = $package ?? [];
 $agencies = $agencies ?? [];
 $owner = $owner ?? null;
 $this->extend('layouts/public');
+$bulanMapPamphlet = [
+    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+];
+$departurePamphletLabel = date('d M Y', strtotime($package['departure_date'] ?? 'now'));
+if (!empty($package['show_departure_month_year_only'])) {
+    $monthsCsv = (string) ($package['pamphlet_departure_months'] ?? '');
+    $yearPamphlet = trim((string) ($package['pamphlet_departure_year'] ?? ''));
+    $monthNames = [];
+    if ($monthsCsv !== '') {
+        foreach (explode(',', $monthsCsv) as $m) {
+            $mi = (int) trim($m);
+            if (isset($bulanMapPamphlet[$mi])) {
+                $monthNames[] = $bulanMapPamphlet[$mi];
+            }
+        }
+        $monthNames = array_values(array_unique($monthNames));
+    }
+    if (!empty($monthNames) && preg_match('/^\d{4}$/', $yearPamphlet) === 1) {
+        $departurePamphletLabel = implode(', ', $monthNames) . ' ' . $yearPamphlet;
+    } else {
+        $tsDep = strtotime($package['departure_date'] ?? 'now');
+        $departurePamphletLabel = ($bulanMapPamphlet[(int) date('n', $tsDep)] ?? date('F', $tsDep)) . ' ' . date('Y', $tsDep);
+    }
+}
 ?>
 <?= $this->section('content') ?>
 
@@ -36,7 +62,7 @@ $this->extend('layouts/public');
                                 <div class="text-center p-3 rounded-4 bg-light border">
                                     <i class="bi bi-calendar-check fs-4 text-primary mb-2"></i>
                                     <small class="text-secondary d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Keberangkatan</small>
-                                    <span class="fw-bold text-dark small"><?= date('d M Y', strtotime($package['departure_date'] ?? '')) ?></span>
+                                    <span class="fw-bold text-dark small"><?= esc($departurePamphletLabel) ?></span>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3">

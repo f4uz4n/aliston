@@ -209,8 +209,34 @@ $paketChunks = array_chunk($packages ?? [], 3);
                                     $hariEn = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
                                     $hariId = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
                                     $ts = strtotime($p['departure_date']);
-                                    $dayName = $hariId[array_search(date('l', $ts), $hariEn)];
-                                    $tglBerangkat = $dayName . ', ' . date('d M Y', $ts);
+                                    $showMonthYearOnly = !empty($p['show_departure_month_year_only']);
+                                    if ($showMonthYearOnly) {
+                                        $bulanMap = [
+                                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                        ];
+                                        $monthsCsv = (string) ($p['pamphlet_departure_months'] ?? '');
+                                        $yearPamphlet = trim((string) ($p['pamphlet_departure_year'] ?? ''));
+                                        $monthNames = [];
+                                        if ($monthsCsv !== '') {
+                                            foreach (explode(',', $monthsCsv) as $m) {
+                                                $mi = (int) trim($m);
+                                                if (isset($bulanMap[$mi])) {
+                                                    $monthNames[] = $bulanMap[$mi];
+                                                }
+                                            }
+                                            $monthNames = array_values(array_unique($monthNames));
+                                        }
+                                        if (!empty($monthNames) && preg_match('/^\d{4}$/', $yearPamphlet) === 1) {
+                                            $tglBerangkat = implode(', ', $monthNames) . ' ' . $yearPamphlet;
+                                        } else {
+                                            $tglBerangkat = ($bulanMap[(int) date('n', $ts)] ?? date('F', $ts)) . ' ' . date('Y', $ts);
+                                        }
+                                    } else {
+                                        $dayName = $hariId[array_search(date('l', $ts), $hariEn)];
+                                        $tglBerangkat = $dayName . ', ' . date('d M Y', $ts);
+                                    }
                                     ?>
                                     <p class="small text-secondary mb-1">
                                         <i class="bi bi-clock me-1"></i> <strong>Durasi:</strong> <?= esc($durasi) ?>

@@ -97,6 +97,30 @@ class Package extends BaseController
         return $out;
     }
 
+    /**
+     * Parse bulan keberangkatan pamflet dari checkbox ke CSV "6,7,8".
+     */
+    private function parsePamphletMonthsFromPost(): ?string
+    {
+        $raw = $this->request->getPost('pamphlet_departure_months');
+        if (! is_array($raw)) {
+            return null;
+        }
+
+        $months = [];
+        foreach ($raw as $m) {
+            $mi = (int) $m;
+            if ($mi >= 1 && $mi <= 12) {
+                $months[] = $mi;
+            }
+        }
+
+        $months = array_values(array_unique($months));
+        sort($months);
+
+        return empty($months) ? null : implode(',', $months);
+    }
+
     /** Isi package dengan data tampilan hotel dari master (untuk relasi display). */
     private function enrichPackageWithHotelMaster(array &$package)
     {
@@ -184,9 +208,15 @@ class Package extends BaseController
         };
 
         $hotelFields = $this->resolveHotelFieldsFromPost();
+        $pamphletMonthsCsv = $this->parsePamphletMonthsFromPost();
+        $pamphletYearRaw = trim((string) $this->request->getPost('pamphlet_departure_year'));
+        $pamphletYear = (preg_match('/^\d{4}$/', $pamphletYearRaw) === 1) ? (int) $pamphletYearRaw : null;
         $data = [
             'name' => $this->request->getPost('name'),
             'departure_date' => $this->request->getPost('departure_date'),
+            'show_departure_month_year_only' => $this->request->getPost('show_departure_month_year_only') ? 1 : 0,
+            'pamphlet_departure_months' => $pamphletMonthsCsv,
+            'pamphlet_departure_year' => $pamphletYear,
             'duration' => $this->request->getPost('duration'),
             'location_start_end' => $this->request->getPost('location_start_end'),
             'hotel_mekkah' => $hotelFields['hotel_mekkah'],
@@ -271,9 +301,15 @@ class Package extends BaseController
         };
 
         $hotelFields = $this->resolveHotelFieldsFromPost();
+        $pamphletMonthsCsv = $this->parsePamphletMonthsFromPost();
+        $pamphletYearRaw = trim((string) $this->request->getPost('pamphlet_departure_year'));
+        $pamphletYear = (preg_match('/^\d{4}$/', $pamphletYearRaw) === 1) ? (int) $pamphletYearRaw : null;
         $data = [
             'name' => $this->request->getPost('name'),
             'departure_date' => $this->request->getPost('departure_date'),
+            'show_departure_month_year_only' => $this->request->getPost('show_departure_month_year_only') ? 1 : 0,
+            'pamphlet_departure_months' => $pamphletMonthsCsv,
+            'pamphlet_departure_year' => $pamphletYear,
             'duration' => $this->request->getPost('duration'),
             'location_start_end' => $this->request->getPost('location_start_end'),
             'hotel_mekkah' => $hotelFields['hotel_mekkah'],

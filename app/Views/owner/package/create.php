@@ -48,6 +48,39 @@
                             <label class="form-label fw-bold small text-uppercase text-secondary ls-1">Lokasi Start - End</label>
                             <input type="text" name="location_start_end" class="form-control form-control-lg bg-light border-0" placeholder="KEDIRI" required>
                         </div>
+                        <div class="col-12">
+                            <div class="form-check mt-1">
+                                <input class="form-check-input" type="checkbox" value="1" id="showDepartureMonthYearOnlyCreate" name="show_departure_month_year_only">
+                                <label class="form-check-label small text-secondary" for="showDepartureMonthYearOnlyCreate">
+                                    Tampilkan keberangkatan <strong>bulan + tahun saja</strong> pada pamflet publik.
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="bg-light border rounded-3 p-3">
+                                <label class="form-label fw-bold small text-uppercase text-secondary ls-1 mb-2">Bulan Keberangkatan (Pamflet)</label>
+                                <?php
+                                $bulanMap = [
+                                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                                ];
+                                ?>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <?php foreach ($bulanMap as $bNum => $bNama): ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="pamphlet_departure_months[]" id="pamphletMonthCreate<?= $bNum ?>" value="<?= $bNum ?>">
+                                        <label class="form-check-label small" for="pamphletMonthCreate<?= $bNum ?>"><?= esc($bNama) ?></label>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="mt-3" style="max-width: 220px;">
+                                    <label class="form-label fw-bold small text-uppercase text-secondary ls-1">Tahun (Pamflet)</label>
+                                    <input type="number" name="pamphlet_departure_year" class="form-control bg-white border" min="2020" max="2100" placeholder="2026">
+                                </div>
+                                <div class="form-text">Contoh hasil pamflet: Juni, Juli, Agustus 2026.</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
