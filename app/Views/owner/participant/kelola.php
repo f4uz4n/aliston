@@ -8,6 +8,36 @@ $isCancelled = ($participant['status'] ?? '') === 'cancelled';
 $verifiedPayments = $verified_payments ?? [];
 $pembayaranLunas = $pembayaran_lunas ?? false;
 $totalTargetKelola = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0);
+
+// Catatan pemberangkatan: simpan sebagai Y-m-d\TH:i (datetime-local); tampilkan d/m/Y H:i
+$dn = trim((string) ($participant['departure_note'] ?? ''));
+$departureNoteDisplayLabel = $dn;
+if ($dn !== '') {
+    if (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/', $dn)) {
+        $ts = strtotime(str_replace('T', ' ', substr($dn, 0, 16)));
+        if ($ts !== false) {
+            $departureNoteDisplayLabel = date('d/m/Y H:i', $ts);
+        }
+    } else {
+        $ts = strtotime($dn);
+        if ($ts !== false) {
+            $departureNoteDisplayLabel = date('d/m/Y H:i', $ts);
+        }
+    }
+}
+$oDn = old('departure_note');
+$dnForInput = $oDn === null ? $dn : trim((string) $oDn);
+$departureDatetimeLocalValue = '';
+if ($dnForInput !== '') {
+    if (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/', $dnForInput)) {
+        $departureDatetimeLocalValue = substr($dnForInput, 0, 16);
+    } else {
+        $tsIn = strtotime($dnForInput);
+        if ($tsIn !== false) {
+            $departureDatetimeLocalValue = date('Y-m-d\TH:i', $tsIn);
+        }
+    }
+}
 ?>
 <div class="row align-items-center mb-4">
     <div class="col-12 col-md-6">
@@ -152,7 +182,7 @@ $totalTargetKelola = (float)($participant['package_price'] ?? 0) + (float)($part
             <div class="card-body">
                 <p class="small text-secondary mb-2">Jadwal saat ini: <strong><?= esc($participant['package_name']) ?></strong> (<?= $participant['package_departure_date'] ? date('d/m/Y', strtotime($participant['package_departure_date'])) : '—' ?>)</p>
                 <?php if (!empty($participant['departure_note'])): ?>
-                <p class="small text-dark mb-3 p-2 rounded-3 bg-light border border-dashed"><span class="text-secondary">Catatan tanggal berangkat:</span> <?= esc($participant['departure_note']) ?></p>
+                <p class="small text-dark mb-3 p-2 rounded-3 bg-light border border-dashed"><span class="text-secondary">Catatan tanggal berangkat:</span> <?= esc($departureNoteDisplayLabel) ?></p>
                 <?php else: ?>
                 <p class="small text-muted mb-3">Belum ada catatan tanggal berangkat tambahan.</p>
                 <?php endif; ?>
@@ -172,8 +202,8 @@ $totalTargetKelola = (float)($participant['package_price'] ?? 0) + (float)($part
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Catatan tanggal pemberangkatan <span class="text-muted fw-normal">(opsional)</span></label>
-                        <input type="text" name="departure_note" class="form-control" maxlength="500" value="<?= esc(old('departure_note', $participant['departure_note'] ?? '')) ?>" placeholder="Contoh: 15 Mei 2026, atau penyesuaian dengan maskapai">
-                        <div class="form-text">Teks bebas untuk catatan tanggal/estimasi berangkat. Kosongkan untuk menghapus catatan.</div>
+                        <input type="datetime-local" name="departure_note" class="form-control bg-light border-0 rounded-3" value="<?= esc($departureDatetimeLocalValue) ?>">
+                        <div class="form-text">Pilih tanggal dan jam estimasi atau catatan pemberangkatan. Kosongkan untuk menghapus catatan.</div>
                     </div>
                     <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-check2 me-1"></i> Simpan Jadwal</button>
                 </form>
