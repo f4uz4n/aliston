@@ -38,3 +38,46 @@ if (! function_exists('format_participant_name_row')) {
         return $row;
     }
 }
+
+if (! function_exists('participant_effective_departure')) {
+    /**
+     * Tanggal/jam efektif keberangkatan untuk hitungan H- dan syarat boarding.
+     * Jika departure_note berisi format datetime-local (Y-m-d\TH:i), nilai itu menggantikan tanggal paket.
+     */
+    function participant_effective_departure(?string $packageDeparture, ?string $departureNote): ?string
+    {
+        $note = trim((string) $departureNote);
+        if ($note !== '' && preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/', $note)) {
+            $normalized = str_replace('T', ' ', substr($note, 0, 16)) . ':00';
+            $ts = strtotime($normalized);
+            if ($ts !== false) {
+                return $normalized;
+            }
+            // catatan tidak valid: pakai tanggal paket
+        }
+
+        $pkg = trim((string) $packageDeparture);
+
+        return $pkg !== '' ? $packageDeparture : null;
+    }
+}
+
+if (! function_exists('participant_days_until_departure')) {
+    /**
+     * Selisih hari kalender antara hari ini dan hari keberangkatan efektif (floor).
+     */
+    function participant_days_until_departure(?string $effectiveDeparture): ?int
+    {
+        if ($effectiveDeparture === null || trim((string) $effectiveDeparture) === '') {
+            return null;
+        }
+        $ts = strtotime($effectiveDeparture);
+        if ($ts === false) {
+            return null;
+        }
+        $today = strtotime(date('Y-m-d'));
+        $depDay = strtotime(date('Y-m-d', $ts));
+
+        return (int) floor(($depDay - $today) / 86400);
+    }
+}

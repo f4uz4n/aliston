@@ -55,7 +55,7 @@
             <?php foreach ($participants as $i => $p): ?>
             <tr>
                 <td class="text-center"><?= $i + 1 ?></td>
-                <td><?= !empty($p['departure_date']) ? date('d/m/Y', strtotime($p['departure_date'])) : '—' ?></td>
+                <td><?= esc($p['boarding_departure_label'] ?? '—') ?></td>
                 <td><?= esc($p['airline'] ?? '—') ?></td>
                 <td><?= esc($p['name']) ?></td>
                 <td><?= esc($p['nik'] ?? '—') ?></td>

@@ -38,6 +38,10 @@ if ($dnForInput !== '') {
         }
     }
 }
+
+$effectiveBoardingDeparture = participant_effective_departure($participant['package_departure_date'] ?? null, $participant['departure_note'] ?? null);
+$boardingScheduleLabel = $effectiveBoardingDeparture ? date('d/m/Y H:i', strtotime($effectiveBoardingDeparture)) : '—';
+$boardingFromCustomNote = ! empty($participant['departure_note']) && preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/', trim((string) $participant['departure_note']));
 ?>
 <div class="row align-items-center mb-4">
     <div class="col-12 col-md-6">
@@ -181,6 +185,7 @@ if ($dnForInput !== '') {
             </div>
             <div class="card-body">
                 <p class="small text-secondary mb-2">Jadwal saat ini: <strong><?= esc($participant['package_name']) ?></strong> (<?= $participant['package_departure_date'] ? date('d/m/Y', strtotime($participant['package_departure_date'])) : '—' ?>)</p>
+                <p class="small text-dark mb-2">Untuk batas H-30, H-15, dan boarding dipakai: <strong><?= esc($boardingScheduleLabel) ?></strong><?php if ($boardingFromCustomNote): ?> <span class="text-muted">— mengikuti catatan tanggal di bawah, bukan tanggal paket.</span><?php endif; ?></p>
                 <?php if (!empty($participant['departure_note'])): ?>
                 <p class="small text-dark mb-3 p-2 rounded-3 bg-light border border-dashed"><span class="text-secondary">Catatan tanggal berangkat:</span> <?= esc($departureNoteDisplayLabel) ?></p>
                 <?php else: ?>
@@ -203,7 +208,7 @@ if ($dnForInput !== '') {
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Catatan tanggal pemberangkatan <span class="text-muted fw-normal">(opsional)</span></label>
                         <input type="datetime-local" name="departure_note" class="form-control bg-light border-0 rounded-3" value="<?= esc($departureDatetimeLocalValue) ?>">
-                        <div class="form-text">Pilih tanggal dan jam estimasi atau catatan pemberangkatan. Kosongkan untuk menghapus catatan.</div>
+                        <div class="form-text">Jika diisi, tanggal ini yang dipakai untuk hitungan H- dan syarat boarding (menggantikan tanggal paket). Kosongkan untuk kembali memakai tanggal paket.</div>
                     </div>
                     <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-check2 me-1"></i> Simpan Jadwal</button>
                 </form>

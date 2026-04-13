@@ -558,13 +558,10 @@ class Participant extends BaseController
         $stats = $this->getDocStats($id);
         $paid = $paymentModel->getTotalPaid($id);
 
-        $departure = $participant['package_departure_date'] ?? null;
-        $daysUntilDeparture = null;
+        $departure = participant_effective_departure($participant['package_departure_date'] ?? null, $participant['departure_note'] ?? null);
+        $daysUntilDeparture = participant_days_until_departure($departure);
         $allow_ubah_jadwal_hotel = false;
-        if ($departure) {
-            $today = date('Y-m-d');
-            $dep = date('Y-m-d', strtotime($departure));
-            $daysUntilDeparture = (int) floor((strtotime($dep) - strtotime($today)) / 86400);
+        if ($daysUntilDeparture !== null) {
             $allow_ubah_jadwal_hotel = ($daysUntilDeparture >= 30) && ($participant['status'] !== 'cancelled');
         }
 
@@ -741,20 +738,21 @@ class Participant extends BaseController
     private function checkH30ForChange($participantId)
     {
         $p = $this->participantModel
-            ->select('participants.*, travel_packages.departure_date')
+            ->select('participants.*, travel_packages.departure_date as pkg_dep_date')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->where('participants.id', $participantId)
             ->first();
         if (!$p || $p['status'] === 'cancelled') {
             return ['allowed' => false, 'message' => 'Jamaah tidak ditemukan atau sudah dibatalkan.'];
         }
-        $dep = $p['departure_date'] ?? null;
+        $dep = participant_effective_departure($p['pkg_dep_date'] ?? null, $p['departure_note'] ?? null);
         if (!$dep) {
             return ['allowed' => false, 'message' => 'Jadwal keberangkatan tidak ditemukan.'];
         }
-        $today = date('Y-m-d');
-        $depDate = date('Y-m-d', strtotime($dep));
-        $days = (int) floor((strtotime($depDate) - strtotime($today)) / 86400);
+        $days = participant_days_until_departure($dep);
+        if ($days === null) {
+            return ['allowed' => false, 'message' => 'Jadwal keberangkatan tidak valid.'];
+        }
         if ($days < 30) {
             return ['allowed' => false, 'message' => 'Perubahan jadwal/hotel/kamar hanya dapat dilakukan minimal H-30 sebelum keberangkatan. Saat ini H-' . abs($days) . '.'];
         }
@@ -945,7 +943,7 @@ class Participant extends BaseController
         }
         $participantId = (int) $this->request->getPost('participant_id');
         $participant = $this->participantModel
-            ->select('participants.*, travel_packages.departure_date, travel_packages.price as package_price')
+            ->select('participants.*, travel_packages.departure_date as pkg_dep_date, travel_packages.price as package_price')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->where('participants.id', $participantId)
             ->first();
@@ -956,11 +954,8 @@ class Participant extends BaseController
         $paymentModel = new PaymentModel();
         $totalPaid = (float)($paymentModel->getTotalPaid($participantId)['amount'] ?? 0);
         $totalTarget = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0);
-        $dep = $participant['departure_date'] ?? null;
-        $days = null;
-        if ($dep) {
-            $days = (int) floor((strtotime(date('Y-m-d', strtotime($dep))) - strtotime(date('Y-m-d'))) / 86400);
-        }
+        $dep = participant_effective_departure($participant['pkg_dep_date'] ?? null, $participant['departure_note'] ?? null);
+        $days = participant_days_until_departure($dep);
         $berkas_ok = ($stats['progress'] >= 100);
         $lunas = ($totalTarget > 0 && $totalPaid >= $totalTarget);
         $h15 = ($days !== null && $days <= 15);
@@ -989,7 +984,7 @@ class Participant extends BaseController
         $packages = $packageModel->orderBy('departure_date', 'DESC')->findAll();
 
         $builder = $this->participantModel
-            ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date, travel_packages.airline, travel_packages.price as package_price, users.full_name as agency_name')
+            ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date as package_departure_date, travel_packages.airline, travel_packages.price as package_price, users.full_name as agency_name')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->join('users', 'users.id = participants.agency_id')
             ->where('participants.status !=', 'cancelled')
@@ -1017,13 +1012,12 @@ class Participant extends BaseController
             $docCount = $docModel->where('participant_id', $p['id'])->where('is_verified', 1)->countAllResults();
             $p['doc_progress'] = $docCount >= 7 ? 100 : round(($docCount / 7) * 100);
             $p['berkas_lengkap'] = ($p['doc_progress'] >= 100);
-            $dep = $p['departure_date'] ?? null;
-            $p['days_until'] = null;
-            if ($dep) {
-                $p['days_until'] = (int) floor((strtotime(date('Y-m-d', strtotime($dep))) - strtotime(date('Y-m-d'))) / 86400);
-            }
+            $eff = participant_effective_departure($p['package_departure_date'] ?? null, $p['departure_note'] ?? null);
+            $p['days_until'] = participant_days_until_departure($eff);
+            $p['boarding_departure_label'] = $eff ? date('d/m/Y H:i', strtotime($eff)) : '—';
             $p['can_boarding'] = ($p['status'] === 'verified' && $p['berkas_lengkap'] && $p['pembayaran_lunas'] && $p['days_until'] !== null && $p['days_until'] <= 15);
         }
+        unset($p);
 
         $data = [
             'participants' => $participants,
@@ -1048,7 +1042,7 @@ class Participant extends BaseController
         $departureTo = $this->request->getGet('departure_date_to');
 
         $builder = $this->participantModel
-            ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date, travel_packages.airline, users.full_name as agency_name')
+            ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date as package_departure_date, travel_packages.airline, users.full_name as agency_name')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->join('users', 'users.id = participants.agency_id')
             ->where('participants.status !=', 'cancelled')
@@ -1066,6 +1060,11 @@ class Participant extends BaseController
         }
 
         $participants = $builder->findAll();
+        foreach ($participants as &$p) {
+            $eff = participant_effective_departure($p['package_departure_date'] ?? null, $p['departure_note'] ?? null);
+            $p['boarding_departure_label'] = $eff ? date('d/m/Y H:i', strtotime($eff)) : '—';
+        }
+        unset($p);
 
         $userModel = new UserModel();
         $owner = $userModel->where('role', 'owner')->first();
@@ -1095,7 +1094,7 @@ class Participant extends BaseController
         $departureTo = $this->request->getGet('departure_date_to');
 
         $builder = $this->participantModel
-            ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date, travel_packages.airline, users.full_name as agency_name')
+            ->select('participants.*, travel_packages.name as package_name, travel_packages.departure_date as package_departure_date, travel_packages.airline, users.full_name as agency_name')
             ->join('travel_packages', 'travel_packages.id = participants.package_id')
             ->join('users', 'users.id = participants.agency_id')
             ->where('participants.status !=', 'cancelled')
@@ -1122,9 +1121,10 @@ class Participant extends BaseController
         fputcsv($out, $headers, ';');
 
         foreach ($participants as $i => $p) {
+            $eff = participant_effective_departure($p['package_departure_date'] ?? null, $p['departure_note'] ?? null);
             $row = [
                 $i + 1,
-                !empty($p['departure_date']) ? date('d/m/Y', strtotime($p['departure_date'])) : '',
+                $eff ? date('d/m/Y H:i', strtotime($eff)) : '',
                 $p['airline'] ?? '',
                 $p['name'] ?? '',
                 $p['nik'] ?? '',

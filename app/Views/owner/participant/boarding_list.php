@@ -77,7 +77,7 @@
                 <?php else: ?>
                 <?php foreach ($participants as $p): ?>
                 <tr>
-                    <td><?= !empty($p['departure_date']) ? date('d/m/Y', strtotime($p['departure_date'])) : '—' ?></td>
+                    <td><?= esc($p['boarding_departure_label'] ?? '—') ?></td>
                     <td><?= esc($p['airline'] ?? '—') ?></td>
                     <td><strong><?= esc($p['name']) ?></strong><br><small class="text-muted"><?= esc($p['nik'] ?? '') ?></small></td>
                     <td class="small"><?= esc($p['agency_name'] ?? '—') ?></td>
@@ -102,7 +102,7 @@
                         <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="openBoardingModal(<?= htmlspecialchars(json_encode([
                             'id' => $p['id'],
                             'name' => $p['name'],
-                            'departure_date' => $p['departure_date'] ?? '',
+                            'departure_label' => $p['boarding_departure_label'] ?? '—',
                             'airline' => $p['airline'] ?? '—',
                             'berkas_lengkap' => $p['berkas_lengkap'],
                             'pembayaran_lunas' => $p['pembayaran_lunas'],
@@ -181,7 +181,7 @@
 <script>
 function openBoardingModal(data) {
     document.getElementById('modalJamaahName').textContent = data.name;
-    document.getElementById('modalDeparture').textContent = data.departure_date ? formatDate(data.departure_date) : '—';
+    document.getElementById('modalDeparture').textContent = data.departure_label || '—';
     document.getElementById('modalAirline').textContent = data.airline || '—';
     document.getElementById('modalBerkas').innerHTML = data.berkas_lengkap
         ? '<span class="badge bg-success rounded-pill">Lengkap</span>'
@@ -197,11 +197,6 @@ function openBoardingModal(data) {
     document.getElementById('btnConfirmBoarding').disabled = !canBoard;
     document.getElementById('modalAlert').style.display = canBoard ? 'none' : 'block';
     new bootstrap.Modal(document.getElementById('boardingModal')).show();
-}
-function formatDate(s) {
-    if (!s) return '—';
-    var d = new Date(s);
-    return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + d.getFullYear();
 }
 </script>
 <?= $this->endSection() ?>
