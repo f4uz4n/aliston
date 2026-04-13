@@ -17,6 +17,58 @@ class TravelSavingModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
+    protected $beforeInsert = ['normalizeTabunganJamaahName'];
+    protected $beforeUpdate = ['normalizeTabunganJamaahName'];
+    protected $afterFind = ['formatTabunganNameAfterFind'];
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    protected function normalizeTabunganJamaahName(array $data)
+    {
+        if (! array_key_exists('name', $data['data'])) {
+            return $data;
+        }
+        $v = $data['data']['name'];
+        if (is_string($v)) {
+            helper('participant');
+            $data['data']['name'] = format_nama_jamaah($v);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    protected function formatTabunganNameAfterFind(array $data)
+    {
+        if (! isset($data['data']) || ! is_array($data['data'])) {
+            return $data;
+        }
+
+        helper('participant');
+        $payload = $data['data'];
+
+        if ($payload !== [] && array_keys($payload) === range(0, count($payload) - 1)) {
+            foreach ($payload as $i => $row) {
+                if (is_array($row) && isset($row['name']) && is_string($row['name']) && $row['name'] !== '') {
+                    $data['data'][$i]['name'] = format_nama_jamaah($row['name']);
+                }
+            }
+
+            return $data;
+        }
+
+        if (isset($payload['name']) && is_string($payload['name']) && $payload['name'] !== '') {
+            $data['data']['name'] = format_nama_jamaah($payload['name']);
+        }
+
+        return $data;
+    }
+
     public function getWithAgency()
     {
         return $this->select('travel_savings.*, users.full_name as agency_name')

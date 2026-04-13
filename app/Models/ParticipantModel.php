@@ -34,6 +34,81 @@ class ParticipantModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
+    protected $beforeInsert = ['normalizeJamaahNames'];
+    protected $beforeUpdate = ['normalizeJamaahNames'];
+    protected $afterFind = ['formatJamaahNamesAfterFind'];
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    protected function normalizeJamaahNames(array $data)
+    {
+        helper('participant');
+        $fields = ['name', 'passport_full_name', 'passport_name_idn', 'emergency_name'];
+        foreach ($fields as $field) {
+            if (! array_key_exists($field, $data['data'])) {
+                continue;
+            }
+            $v = $data['data'][$field];
+            if ($v === null) {
+                continue;
+            }
+            if (is_string($v)) {
+                $data['data'][$field] = format_nama_jamaah($v);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Tampilan konsisten huruf besar untuk data lama & baru.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    protected function formatJamaahNamesAfterFind(array $data)
+    {
+        if (! isset($data['data']) || ! is_array($data['data'])) {
+            return $data;
+        }
+
+        helper('participant');
+        $payload = $data['data'];
+
+        if ($payload !== [] && array_keys($payload) === range(0, count($payload) - 1)) {
+            foreach ($payload as $i => $row) {
+                if (is_array($row)) {
+                    $data['data'][$i] = $this->applyJamaahNameFormatting($row);
+                }
+            }
+
+            return $data;
+        }
+
+        if (isset($payload['id']) || isset($payload['name'])) {
+            $data['data'] = $this->applyJamaahNameFormatting($payload);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function applyJamaahNameFormatting(array $row): array
+    {
+        foreach (['name', 'passport_full_name', 'passport_name_idn', 'emergency_name'] as $field) {
+            if (isset($row[$field]) && is_string($row[$field]) && $row[$field] !== '') {
+                $row[$field] = format_nama_jamaah($row[$field]);
+            }
+        }
+
+        return $row;
+    }
+
     public function getParticipantBuilder()
     {
         return $this->select('participants.*, travel_packages.name as package_name, travel_packages.price as package_price, users.full_name as agency_name, users.username as agency_username')
