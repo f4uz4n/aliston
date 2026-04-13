@@ -34,7 +34,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Sesuai KTP" required value="<?= old('name', $participant['name']) ?>">
+                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Sesuai KTP" required value="<?= old('name', $participant['name']) ?>">
                         </div>
                         
                         <div class="col-md-4">
@@ -145,11 +145,11 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Lengkap (sesuai paspor)</label>
-                            <input type="text" name="passport_full_name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Nama di paspor" value="<?= old('passport_full_name', $participant['passport_full_name'] ?? '') ?>">
+                            <input type="text" name="passport_full_name" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Nama di paspor" value="<?= old('passport_full_name', $participant['passport_full_name'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Indonesia (nama IDN di paspor)</label>
-                            <input type="text" name="passport_name_idn" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Nama Indonesia di paspor" value="<?= old('passport_name_idn', $participant['passport_name_idn'] ?? '') ?>">
+                            <input type="text" name="passport_name_idn" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Nama Indonesia di paspor" value="<?= old('passport_name_idn', $participant['passport_name_idn'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Kewarganegaraan</label>
@@ -192,7 +192,7 @@
                     <div class="row g-4">
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Kontak</label>
-                            <input type="text" name="emergency_name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Nama Keluarga" required value="<?= old('emergency_name', $participant['emergency_name']) ?>">
+                            <input type="text" name="emergency_name" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Nama Keluarga" required value="<?= old('emergency_name', $participant['emergency_name']) ?>">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Hubungan</label>

@@ -21,7 +21,7 @@
             </div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Nama Lengkap *</label>
-                <input type="text" name="name" class="form-control form-control-lg bg-light border-0" required minlength="3" value="<?= esc(old('name')) ?>" placeholder="Nama sesuai KTP">
+                <input type="text" name="name" class="form-control form-control-lg bg-light border-0 input-nama-jamaah-upper" required minlength="3" value="<?= esc(old('name')) ?>" placeholder="Nama sesuai KTP">
             </div>
             <div class="row g-3">
                 <div class="col-md-6">

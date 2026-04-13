@@ -35,7 +35,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Sesuai KTP" required>
+                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Sesuai KTP" required>
                         </div>
                         
                         <div class="col-md-4">
@@ -110,11 +110,11 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Lengkap (sesuai paspor)</label>
-                            <input type="text" name="passport_full_name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Nama di paspor">
+                            <input type="text" name="passport_full_name" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Nama di paspor">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Indonesia (nama IDN di paspor)</label>
-                            <input type="text" name="passport_name_idn" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Nama Indonesia di paspor">
+                            <input type="text" name="passport_name_idn" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Nama Indonesia di paspor">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Kewarganegaraan</label>
@@ -190,7 +190,7 @@
                     <div class="row g-4">
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Kontak Darurat</label>
-                            <input type="text" name="emergency_name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Nama Keluarga" required>
+                            <input type="text" name="emergency_name" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Nama Keluarga" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Hubungan</label>

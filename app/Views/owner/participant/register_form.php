@@ -35,7 +35,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Sesuai KTP" required value="<?= esc(old('name')) ?>">
+                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3 input-nama-jamaah-upper" placeholder="Sesuai KTP" required value="<?= esc(old('name')) ?>">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold text-secondary text-uppercase ls-1">Tempat Lahir</label>

@@ -34,7 +34,7 @@
                             <?= csrf_field() ?>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Nama <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control bg-light border-0" value="<?= esc(old('name')) ?>" required placeholder="Nama jamaah" maxlength="255">
+                                <input type="text" name="name" class="form-control bg-light border-0 input-nama-jamaah-upper" value="<?= esc(old('name')) ?>" required placeholder="Nama jamaah" maxlength="255">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Paket (opsional)</label>

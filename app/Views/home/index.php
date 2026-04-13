@@ -404,7 +404,7 @@ $testimoniChunks = array_chunk($testimonials, 3);
                             <?= csrf_field() ?>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Nama <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" value="<?= esc(old('name')) ?>" required placeholder="Nama lengkap atau inisial" maxlength="255">
+                                <input type="text" name="name" class="form-control input-nama-jamaah-upper" value="<?= esc(old('name')) ?>" required placeholder="Nama lengkap atau inisial" maxlength="255">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Paket (opsional)</label>

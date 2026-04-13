@@ -84,6 +84,37 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function() {
+        function upperNamaJamaah(el) {
+            if (!el || el.disabled || el.readOnly) return;
+            var v = el.value;
+            if (v === '') return;
+            var upper;
+            try { upper = v.toLocaleUpperCase('id-ID'); } catch (e) { upper = v.toUpperCase(); }
+            if (v !== upper) {
+                var start = el.selectionStart, end = el.selectionEnd;
+                el.value = upper;
+                if (start != null && end != null && typeof el.setSelectionRange === 'function') {
+                    try { el.setSelectionRange(start, end); } catch (err) {}
+                }
+            }
+        }
+        document.addEventListener('input', function(e) {
+            var t = e.target;
+            if (t && t.matches && t.matches('input.input-nama-jamaah-upper')) upperNamaJamaah(t);
+        }, true);
+        document.addEventListener('blur', function(e) {
+            var t = e.target;
+            if (t && t.matches && t.matches('input.input-nama-jamaah-upper')) upperNamaJamaah(t);
+        }, true);
+        function initNamaJamaahUpper() {
+            document.querySelectorAll('input.input-nama-jamaah-upper').forEach(upperNamaJamaah);
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNamaJamaahUpper);
+        else initNamaJamaahUpper();
+    })();
+    </script>
     <?= $this->renderSection('scripts') ?>
 </body>
 </html>
