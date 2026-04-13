@@ -223,7 +223,7 @@
         </div>
         <div class="col-4 text-center">
             <div class="mb-3 pb-2">
-                <div class="info-label">Sekretaris/Bendahara,</div>
+                <div class="info-label">Manager Keuangan,</div>
             </div>
             <div class="mt-3 pt-2">
                 <div class="h5 fw-bold mb-0"><?= esc($nama_penandatangan ?? session()->get('full_name')) ?></div>

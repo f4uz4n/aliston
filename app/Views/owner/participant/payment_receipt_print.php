@@ -114,7 +114,7 @@
         </div>
 
         <div class="signature-block">
-            <div class="ttd-label">Sekretaris/Bendahara</div>
+            <div class="ttd-label">Manager Keuangan</div>
             <?php if (!empty($nama_pt)): ?>
                 <div class="ttd-pt"><?= esc($nama_pt) ?></div>
             <?php endif; ?>
@@ -122,7 +122,7 @@
                 <img src="<?= esc($qr_url) ?>" alt="Tanda Tangan Digital" width="120" height="120">
                 <div class="qr-ttd-caption">Tanda Tangan Digital — <?= esc($tanggal_signature ?? '') ?></div>
             </div>
-            <div class="nama-pemilik-label">Sekretaris/Bendahara</div>
+            <div class="nama-pemilik-label">Manager Keuangan</div>
             <div class="nama-pemilik-value"><?= esc($nama_penandatangan ?? $nama_direktur ?? '—') ?></div>
         </div>
     </div>
