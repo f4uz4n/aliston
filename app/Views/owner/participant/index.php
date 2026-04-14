@@ -137,7 +137,7 @@
                                            title="Kelola (jadwal, hotel, kamar, verifikasi pembayaran, dll)">
                                             <i class="bi bi-gear-fill me-1"></i> Kelola
                                         </a>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center btn-history" style="width: 32px; height: 32px;" data-id="<?= $part['id'] ?>" data-name="<?= esc($part['name']) ?>" title="Riwayat Pembayaran"><i class="bi bi-clock-history"></i></button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center btn-history" style="width: 32px; height: 32px;" data-id="<?= $part['id'] ?>" data-name="<?= esc(format_nama_jamaah($part['name'] ?? '')) ?>" title="Riwayat Pembayaran"><i class="bi bi-clock-history"></i></button>
                                         <?php $total_target_part = $part['total_target'] ?? ((float)($part['package_price'] ?? 0) + (float)($part['upgrade_cost'] ?? 0)); $lunas = $total_target_part > 0 && ($part['total_paid'] ?? 0) >= $total_target_part; ?>
                                         <?php if ($lunas): ?>
                                         <a href="<?= base_url('owner/participant/receipt/' . $part['id']) ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cetak Kwitansi Lunas"><i class="bi bi-printer"></i></a>

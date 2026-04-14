@@ -48,7 +48,7 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
                 <select name="participant_id" class="form-select border-0 bg-light">
                     <option value="">Semua Jamaah</option>
                     <?php foreach (($participants_list ?? []) as $pj): ?>
-                        <option value="<?= (int)$pj['id'] ?>" <?= (string)($filters['participant_id'] ?? '') === (string)$pj['id'] ? 'selected' : '' ?>><?= esc(format_nama_jamaah_title($pj['name'])) ?></option>
+                        <option value="<?= (int)$pj['id'] ?>" <?= (string)($filters['participant_id'] ?? '') === (string)$pj['id'] ? 'selected' : '' ?>><?= esc(format_nama_jamaah($pj['name'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -115,7 +115,7 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
                         <tr>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center mb-1">
-                                    <span class="fw-bold text-dark me-2"><?= esc(format_nama_jamaah_title($p['participant_name'] ?? '')) ?></span>
+                                    <span class="fw-bold text-dark me-2"><?= esc(format_nama_jamaah($p['participant_name'] ?? '')) ?></span>
                                     <span class="badge bg-light text-secondary border"><?= esc($p['participant_nik']) ?></span>
                                 </div>
                                 <div class="small text-secondary mb-1">

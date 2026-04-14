@@ -322,6 +322,7 @@ class Owner extends BaseController
 
         // Enrich data with payment progress (total = harga paket + upgrade)
         foreach ($payments as &$p) {
+            $p['participant_name'] = format_nama_jamaah($p['participant_name'] ?? '');
             $paid = $paymentModel->getTotalPaid($p['participant_id']);
             $p['total_paid_verified'] = $paid['amount'] ?? 0;
             $total_target = (float)($p['package_price'] ?? 0) + (float)($p['upgrade_cost'] ?? 0);
@@ -334,9 +335,14 @@ class Owner extends BaseController
                 $p['progress_percentage'] = 0;
             }
         }
+        unset($p);
 
         // Daftar jamaah untuk dropdown filter (select by nama jamaah)
         $participantsList = $participantModel->select('id, name')->orderBy('name', 'ASC')->findAll();
+        foreach ($participantsList as &$pj) {
+            $pj['name'] = format_nama_jamaah($pj['name'] ?? '');
+        }
+        unset($pj);
 
         $userModel = new \App\Models\UserModel();
         $owner = $userModel->where('role', 'owner')->first();
@@ -393,6 +399,7 @@ class Owner extends BaseController
         if (!$payment) {
             return redirect()->to('owner/payment-verification')->with('error', 'Data pembayaran tidak ditemukan.');
         }
+        $payment['participant_name'] = format_nama_jamaah($payment['participant_name'] ?? '');
         $data = [
             'payment' => $payment,
             'title' => 'Edit Pembayaran',
