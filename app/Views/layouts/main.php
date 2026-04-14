@@ -1,11 +1,12 @@
-<?php helper('access'); ?>
+<?php helper('access');
+helper('branding'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aliston Tour & Travel - Premium Dashboard</title>
-    <link rel="icon" type="image/png" href="<?= get_company_logo() ?>">
+    <?= view('partials/favicon_links') ?>
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
@@ -236,6 +237,15 @@
 
         main.expanded {
             margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .app-credit-footer {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            padding: 1rem 0 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.35);
+            text-align: center;
         }
 
         /* Cards & Components */
@@ -788,6 +798,7 @@
         <?php endif; ?>
 
         <?= $this->renderSection('content') ?>
+        <footer class="app-credit-footer">PT. AMZHA DIGITAL NUSANTARA @ 2025</footer>
     </main>
 
     <script>
@@ -996,6 +1007,7 @@
         <!-- Public Area (Login Page fallback) -->
         <div class="main-content container py-5">
             <?= $this->renderSection('content') ?>
+            <footer class="app-credit-footer">PT. AMZHA DIGITAL NUSANTARA @ 2025</footer>
         </div>
     <?php endif; ?>
 

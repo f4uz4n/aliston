@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Pernyataan Pembatalan — <?= esc($participant['name']) ?></title>
+    <?= view('partials/favicon_links') ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         @page { size: A4; margin: 20mm; }
@@ -102,5 +103,6 @@
     <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" onclick="window.print()">Cetak</button>
     <a href="javascript:window.close()" class="btn btn-outline-secondary btn-sm rounded-pill px-4 ms-2">Tutup</a>
 </div>
+<?= view('partials/developer_footer_print') ?>
 </body>
 </html>

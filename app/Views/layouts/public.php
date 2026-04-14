@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? get_company_name() ?></title>
-    <link rel="icon" type="image/png" href="<?= get_company_logo() ?>">
+    <?= view('partials/favicon_links') ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -79,6 +79,7 @@
                 <div class="col-md-6 text-center text-md-end small">
                     <a href="<?= base_url('login') ?>">Login Admin / Agen</a> &middot;
                     <span>&copy; <?= date('Y') ?> <?= get_company_name() ?></span>
+                    <div class="mt-2 text-white-50">PT. AMZHA DIGITAL NUSANTARA @ 2025</div>
                 </div>
             </div>
         </div>

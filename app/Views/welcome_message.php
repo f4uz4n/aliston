@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Welcome to Aliston Tour & Travel</title>
     <meta name="description" content="Your premium travel partner">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="/favicon.ico">
+    <?= view('partials/favicon_links') ?>
 
     <!-- STYLES -->
 
