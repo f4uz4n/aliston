@@ -17,7 +17,23 @@
             --light: #f8f9fa;
             --logo-green: #00a651;
         }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; color: #333; }
+        body.body-public-site { font-family: 'Plus Jakarta Sans', sans-serif; color: #333; padding-bottom: 48px; }
+        .public-developer-strip {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1055;
+            text-align: left;
+            padding: 0.65rem 1rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: #1e293b;
+            background: rgba(255, 255, 255, 0.97);
+            border-top: 1px solid #cbd5e1;
+            box-shadow: 0 -6px 24px rgba(15, 23, 42, 0.1);
+        }
         .navbar-public { background: #fff; box-shadow: 0 2px 20px rgba(0,0,0,.08); }
         .navbar-wrapper { position: sticky; top: 0; z-index: 1030; }
         .navbar-divider { height: 4px; background: var(--logo-green); box-shadow: 0 2px 8px rgba(0,0,0,.12); }
@@ -41,7 +57,7 @@
         .service-icon-circle { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1rem; }
     </style>
 </head>
-<body>
+<body class="body-public-site">
     <div class="navbar-wrapper">
     <nav class="navbar navbar-expand-lg navbar-public py-3">
         <div class="container">
@@ -79,11 +95,11 @@
                 <div class="col-md-6 text-center text-md-end small">
                     <a href="<?= base_url('login') ?>">Login Admin / Agen</a> &middot;
                     <span>&copy; <?= date('Y') ?> <?= get_company_name() ?></span>
-                    <div class="mt-2 text-white-50">PT. AMZHA DIGITAL NUSANTARA @ 2025</div>
                 </div>
             </div>
         </div>
     </footer>
+    <div class="public-developer-strip" role="contentinfo">PT. AMZHA DIGITAL NUSANTARA @ 2025</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     (function() {

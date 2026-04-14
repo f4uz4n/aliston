@@ -231,6 +231,7 @@ helper('branding'); ?>
             margin-top: var(--topbar-height);
             margin-left: var(--sidebar-width);
             padding: 2.5rem;
+            padding-bottom: calc(2.5rem + 52px);
             transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
             min-height: calc(100vh - var(--topbar-height));
         }
@@ -240,12 +241,36 @@ helper('branding'); ?>
         }
 
         .app-credit-footer {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            padding: 1rem 0 0;
-            margin-top: 2rem;
-            border-top: 1px solid rgba(148, 163, 184, 0.35);
-            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            z-index: 850;
+            text-align: left;
+            padding: 0.7rem 2.5rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: #1e293b;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid #cbd5e1;
+            box-shadow: 0 -6px 24px rgba(15, 23, 42, 0.08);
+            transition: left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .app-credit-footer.expanded {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        .app-credit-footer--full {
+            left: 0;
+            right: 0;
+        }
+
+        .main-content--login {
+            padding-bottom: calc(3rem + 52px);
         }
 
         /* Cards & Components */
@@ -349,6 +374,17 @@ helper('branding'); ?>
             #topbar {
                 left: 0 !important;
                 width: 100% !important;
+            }
+
+            .app-credit-footer {
+                left: 0 !important;
+                right: 0 !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .app-credit-footer.expanded {
+                left: 0 !important;
             }
 
             /* Overlay untuk mobile */
@@ -798,14 +834,24 @@ helper('branding'); ?>
         <?php endif; ?>
 
         <?= $this->renderSection('content') ?>
-        <footer class="app-credit-footer">PT. AMZHA DIGITAL NUSANTARA @ 2025</footer>
     </main>
+    <footer id="appCreditFooter" class="app-credit-footer">PT. AMZHA DIGITAL NUSANTARA @ 2025</footer>
 
     <script>
         const sidebar = document.getElementById('sidebar');
         const topbar = document.getElementById('topbar');
         const main = document.getElementById('main-content');
+        const creditFooter = document.getElementById('appCreditFooter');
         const toggle = document.getElementById('toggle-sidebar');
+
+        function syncCreditFooterExpanded() {
+            if (!creditFooter || !main) return;
+            if (window.innerWidth > 991.98) {
+                creditFooter.classList.toggle('expanded', main.classList.contains('expanded'));
+            } else {
+                creditFooter.classList.remove('expanded');
+            }
+        }
 
         toggle.addEventListener('click', () => {
             // Di mobile, toggle mobile menu
@@ -820,6 +866,7 @@ helper('branding'); ?>
                 sidebar.classList.toggle('collapsed');
                 topbar.classList.toggle('expanded');
                 main.classList.toggle('expanded');
+                syncCreditFooterExpanded();
             }
         });
 
@@ -838,7 +885,9 @@ helper('branding'); ?>
                 sidebar.classList.remove('mobile-open');
                 if (overlay) overlay.classList.remove('show');
             }
+            syncCreditFooterExpanded();
         });
+        syncCreditFooterExpanded();
 
         // Fungsi untuk menutup sidebar di mobile
         function closeMobileSidebar() {
@@ -1005,10 +1054,10 @@ helper('branding'); ?>
     </script>
     <?php else: ?>
         <!-- Public Area (Login Page fallback) -->
-        <div class="main-content container py-5">
+        <div class="main-content container py-5 main-content--login">
             <?= $this->renderSection('content') ?>
-            <footer class="app-credit-footer">PT. AMZHA DIGITAL NUSANTARA @ 2025</footer>
         </div>
+        <footer class="app-credit-footer app-credit-footer--full">PT. AMZHA DIGITAL NUSANTARA @ 2025</footer>
     <?php endif; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
