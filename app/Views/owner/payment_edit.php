@@ -9,7 +9,7 @@ $amtVal = $oldAmount !== null && $oldAmount !== '' ? preg_replace('/\D/', '', $o
     <div class="col-12 col-lg-8">
         <a href="<?= base_url('owner/payment-verification') ?>" class="btn btn-light border rounded-pill px-3 fw-bold mb-3"><i class="bi bi-arrow-left me-2"></i>Kembali</a>
         <h2 class="fw-800 text-dark mb-1">Edit Pembayaran</h2>
-        <p class="text-secondary mb-2"><?= esc($p['participant_name'] ?? '') ?> — <?= esc($p['agency_name'] ?? '') ?></p>
+        <p class="text-secondary mb-2"><?= esc(format_nama_jamaah_title($p['participant_name'] ?? '')) ?> — <?= esc($p['agency_name'] ?? '') ?></p>
         <p class="text-secondary mb-4"><i class="bi bi-box-seam me-1"></i> <?= esc($p['package_name'] ?? '') ?> · Status: <span class="badge bg-<?= ($p['status'] ?? '') === 'verified' ? 'success' : (($p['status'] ?? '') === 'rejected' ? 'danger' : 'warning text-dark') ?>"><?= ($p['status'] ?? '') === 'verified' ? 'Diterima' : (($p['status'] ?? '') === 'rejected' ? 'Ditolak' : 'Pending') ?></span></p>
 
         <?php if (session()->getFlashdata('errors')): $err = session()->getFlashdata('errors'); ?>

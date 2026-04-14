@@ -20,6 +20,27 @@ if (! function_exists('format_nama_jamaah')) {
     }
 }
 
+if (! function_exists('format_nama_jamaah_title')) {
+    /**
+     * Nama jamaah untuk tampilan daftar: huruf awal tiap kata besar (title case), UTF-8.
+     */
+    function format_nama_jamaah_title(?string $name): string
+    {
+        if ($name === null) {
+            return '';
+        }
+        $t = trim($name);
+        if ($t === '') {
+            return '';
+        }
+        if (function_exists('mb_convert_case') && function_exists('mb_strtolower')) {
+            return mb_convert_case(mb_strtolower($t, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+        }
+
+        return ucwords(strtolower($t));
+    }
+}
+
 if (! function_exists('format_participant_name_row')) {
     /**
      * Terapkan format nama jamaah pada satu baris hasil query (mis. getRowArray).
