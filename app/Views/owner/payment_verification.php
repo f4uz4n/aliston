@@ -137,6 +137,11 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
                                     <span class="text-muted">Total Tagihan:</span>
                                     <span class="fw-bold text-dark ms-1">Rp <?= number_format($p['total_target'] ?? (($p['package_price'] ?? 0) + ($p['upgrade_cost'] ?? 0)), 0, ',', '.') ?></span>
                                 </div>
+                                <div class="mt-1 text-end small">
+                                    <?php $sisaBayar = max(0, (float)($p['total_target'] ?? 0) - (float)($p['total_paid_verified'] ?? 0)); ?>
+                                    <span class="text-muted">Kekurangan Bayar:</span>
+                                    <span class="fw-bold <?= $sisaBayar > 0 ? 'text-danger' : 'text-success' ?> ms-1">Rp <?= number_format($sisaBayar, 0, ',', '.') ?></span>
+                                </div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">

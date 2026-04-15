@@ -60,3 +60,43 @@ if (!function_exists('get_company_favicon_type')) {
         }
     }
 }
+
+if (!function_exists('get_company_favicon_safari_url')) {
+    /**
+     * Safari lebih konsisten dengan png/jpg/gif/ico untuk favicon.
+     * Jika logo memakai format lain (mis. svg/webp), fallback ke logo png default.
+     */
+    function get_company_favicon_safari_url()
+    {
+        $href = get_company_favicon_url();
+        $path = parse_url($href, PHP_URL_PATH) ?: $href;
+        $ext = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+
+        if (in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'ico'], true)) {
+            return $href;
+        }
+
+        return base_url('assets/img/logo_.png');
+    }
+}
+
+if (!function_exists('get_company_favicon_safari_type')) {
+    function get_company_favicon_safari_type()
+    {
+        $href = get_company_favicon_safari_url();
+        $path = parse_url($href, PHP_URL_PATH) ?: $href;
+        $ext = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+
+        switch ($ext) {
+            case 'jpg':
+            case 'jpeg':
+                return 'image/jpeg';
+            case 'gif':
+                return 'image/gif';
+            case 'ico':
+                return 'image/x-icon';
+            default:
+                return 'image/png';
+        }
+    }
+}

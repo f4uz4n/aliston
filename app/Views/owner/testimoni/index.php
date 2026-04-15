@@ -15,6 +15,53 @@
     <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-4"><?= session()->getFlashdata('error') ?></div>
 <?php endif; ?>
 
+<?php $packages = $packages ?? []; ?>
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-plus-circle me-2 text-primary"></i>Tambah Testimoni</h6>
+        <form action="<?= base_url('owner/testimoni/store') ?>" method="post" class="row g-3">
+            <?= csrf_field() ?>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Nama</label>
+                <input type="text" name="name" class="form-control bg-light border-0" required minlength="2" maxlength="255" value="<?= esc(old('name')) ?>" placeholder="Nama jamaah">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Paket (Opsional)</label>
+                <select name="package_id" class="form-select bg-light border-0">
+                    <option value="">Tanpa paket</option>
+                    <?php foreach ($packages as $pkg): ?>
+                        <option value="<?= (int)($pkg['id'] ?? 0) ?>" <?= (string)old('package_id') === (string)($pkg['id'] ?? '') ? 'selected' : '' ?>>
+                            <?= esc($pkg['name'] ?? '-') ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">Rating</label>
+                <select name="rating" class="form-select bg-light border-0" required>
+                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                        <option value="<?= $i ?>" <?= (string)old('rating', '5') === (string)$i ? 'selected' : '' ?>><?= $i ?> Bintang</option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Status</label>
+                <select name="status" class="form-select bg-light border-0" required>
+                    <option value="pending" <?= old('status', 'pending') === 'pending' ? 'selected' : '' ?>>Pending</option>
+                    <option value="verified" <?= old('status') === 'verified' ? 'selected' : '' ?>>Langsung Verifikasi</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label small fw-bold">Isi Testimoni</label>
+                <textarea name="testimonial" class="form-control bg-light border-0" rows="3" required minlength="10" placeholder="Tulis testimoni (min. 10 karakter)"><?= esc(old('testimonial')) ?></textarea>
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Simpan Testimoni</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card border-0 shadow-sm rounded-4 mb-4">
     <div class="card-body p-4">
         <form action="<?= base_url('owner/testimoni') ?>" method="get" class="row g-3 align-items-end">

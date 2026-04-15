@@ -611,6 +611,7 @@ class Owner extends BaseController
     public function testimoni()
     {
         $testimonialModel = new \App\Models\TestimonialModel();
+        $packageModel = new \App\Models\PackageModel();
         $status = $this->request->getGet('status');
         $filters = [];
         if ($status && in_array($status, ['pending', 'verified'], true)) {
@@ -618,9 +619,48 @@ class Owner extends BaseController
         }
         $data = [
             'testimonials' => $testimonialModel->getListForAdmin($filters),
+            'packages' => $packageModel->orderBy('name', 'ASC')->findAll(),
             'filter_status' => $status,
         ];
         return view('owner/testimoni/index', $data);
+    }
+
+    /**
+     * Tambah testimoni manual dari admin kantor/pemilik.
+     */
+    public function storeTestimoni()
+    {
+        $rules = [
+            'name' => 'required|min_length[2]|max_length[255]',
+            'testimonial' => 'required|min_length[10]',
+            'rating' => 'required|in_list[1,2,3,4,5]',
+            'status' => 'required|in_list[pending,verified]',
+        ];
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('error', 'Lengkapi nama, testimoni (min. 10 karakter), rating, dan status.');
+        }
+
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $status = $this->request->getPost('status');
+        $packageId = $this->request->getPost('package_id');
+
+        $insertData = [
+            'name' => $this->request->getPost('name'),
+            'package_id' => $packageId ? (int) $packageId : null,
+            'testimonial' => $this->request->getPost('testimonial'),
+            'rating' => (int) $this->request->getPost('rating'),
+            'status' => $status,
+            'source' => 'office',
+            'agency_id' => null,
+        ];
+
+        if ($status === 'verified') {
+            $insertData['verified_at'] = date('Y-m-d H:i:s');
+            $insertData['verified_by'] = session()->get('id');
+        }
+
+        $testimonialModel->insert($insertData);
+        return redirect()->to('owner/testimoni')->with('msg', 'Testimoni berhasil ditambahkan.');
     }
 
     /**

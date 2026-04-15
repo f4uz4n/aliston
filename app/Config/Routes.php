@@ -152,6 +152,14 @@ $routes->group('owner', ['filter' => 'auth:owner,office_admin'], function ($rout
         $routes->post('rubrik-berita/update/(:num)', 'RubrikBerita::update/$1');
         $routes->get('rubrik-berita/delete/(:num)', 'RubrikBerita::delete/$1');
         $routes->post('rubrik-berita/toggle-status/(:num)', 'RubrikBerita::toggleStatus/$1');
+
+        // Testimoni Jamaah (owner + admin kantor)
+        $routes->get('testimoni', 'Owner::testimoni');
+        $routes->post('testimoni/store', 'Owner::storeTestimoni');
+        $routes->get('testimoni/edit/(:num)', 'Owner::editTestimoni/$1');
+        $routes->post('testimoni/update/(:num)', 'Owner::updateTestimoni/$1');
+        $routes->post('testimoni/delete/(:num)', 'Owner::deleteTestimoni/$1');
+        $routes->post('testimoni/verify/(:num)', 'Owner::verifyTestimoni/$1');
     });
 
 // Agensi, pembuatan admin kantor, laporan bisnis (berisi data agensi): hanya pemilik
@@ -168,12 +176,6 @@ $routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
     $routes->post('participant/process-boarding', 'Participant::processBoarding');
     $routes->post('participant/confirm-boarding', 'Participant::confirmBoarding');
     $routes->post('tabungan/verify-deposit/(:num)', 'Tabungan::verifyDeposit/$1');
-    $routes->get('testimoni', 'Owner::testimoni');
-    $routes->get('testimoni/edit/(:num)', 'Owner::editTestimoni/$1');
-    $routes->post('testimoni/update/(:num)', 'Owner::updateTestimoni/$1');
-    $routes->post('testimoni/delete/(:num)', 'Owner::deleteTestimoni/$1');
-    $routes->post('testimoni/verify/(:num)', 'Owner::verifyTestimoni/$1');
-
     $routes->group('agency', function ($routes) {
         $routes->get('/', 'AgencyAdmin::index');
         $routes->get('create', 'AgencyAdmin::create');

@@ -621,7 +621,7 @@ helper('branding'); ?>
                                 <span>Banner Beranda</span>
                             </a>
                         </li>
-                        <?php if (is_owner()): ?>
+                        <?php if (is_back_office()): ?>
                         <li class="nav-item">
                             <a href="<?= base_url('owner/testimoni') ?>" class="nav-link <?= strpos(current_url(), 'owner/testimoni') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-chat-quote"></i>

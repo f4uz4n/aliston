@@ -460,12 +460,31 @@ class Participant extends BaseController
         }
 
         $paymentModel = new PaymentModel();
+        $participant = $this->participantModel
+            ->select('participants.id, participants.upgrade_cost, travel_packages.price as package_price')
+            ->join('travel_packages', 'travel_packages.id = participants.package_id')
+            ->where('participants.id', (int) $id)
+            ->first();
+
+        if (!$participant) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Jamaah tidak ditemukan']);
+        }
+
         $history = $paymentModel->where('participant_id', $id)
             ->orderBy('payment_date', 'DESC')
             ->findAll();
 
+        $totalPaid = (float) ($paymentModel->getTotalPaid($id)['amount'] ?? 0);
+        $totalTarget = (float) ($participant['package_price'] ?? 0) + (float) ($participant['upgrade_cost'] ?? 0);
+        $remaining = max(0, $totalTarget - $totalPaid);
+
         return $this->response->setJSON([
             'status' => 'success',
+            'summary' => [
+                'total_paid' => $totalPaid,
+                'remaining' => $remaining,
+                'total_target' => $totalTarget,
+            ],
             'data' => $history
         ]);
     }
