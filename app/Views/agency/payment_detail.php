@@ -13,9 +13,14 @@
                 </nav>
                 <h2 class="fw-800 text-dark mb-0">Jamaah: <?= esc($participant['name']) ?></h2>
             </div>
-            <a href="<?= base_url('agency/payments') ?>" class="btn btn-light border rounded-pill px-4 fw-bold">
-                <i class="bi bi-arrow-left me-2"></i>Kembali
-            </a>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <a href="<?= base_url('agency/receipt/'.$participant['id']) ?>" target="_blank" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+                    <i class="bi bi-printer me-2"></i>Cetak Kwitansi
+                </a>
+                <a href="<?= base_url('agency/payments') ?>" class="btn btn-light border rounded-pill px-4 fw-bold">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                </a>
+            </div>
         </div>
 
         <?php if(session()->getFlashdata('msg')): ?>
@@ -120,6 +125,16 @@
                 <h5 class="fw-bold text-dark mb-0">Riwayat Pembayaran</h5>
             </div>
             <div class="card-body p-0">
+                <div class="row g-0 px-4 py-3 border-bottom bg-light-subtle">
+                    <div class="col-12 col-md-6 mb-2 mb-md-0">
+                        <div class="small text-secondary">Total Sudah Dibayar</div>
+                        <div class="fw-bold text-success">Rp <?= number_format((float)$total_paid, 0, ',', '.') ?></div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="small text-secondary">Total Kekurangan Bayar</div>
+                        <div class="fw-bold <?= $sisa_tagihan > 0 ? 'text-danger' : 'text-success' ?>">Rp <?= number_format((float)$sisa_tagihan, 0, ',', '.') ?></div>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">

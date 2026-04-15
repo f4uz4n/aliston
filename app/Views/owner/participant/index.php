@@ -138,10 +138,7 @@
                                             <i class="bi bi-gear-fill me-1"></i> Kelola
                                         </a>
                                         <button type="button" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center btn-history" style="width: 32px; height: 32px;" data-id="<?= $part['id'] ?>" data-name="<?= esc(format_nama_jamaah($part['name'] ?? '')) ?>" title="Riwayat Pembayaran"><i class="bi bi-clock-history"></i></button>
-                                        <?php $total_target_part = $part['total_target'] ?? ((float)($part['package_price'] ?? 0) + (float)($part['upgrade_cost'] ?? 0)); $lunas = $total_target_part > 0 && ($part['total_paid'] ?? 0) >= $total_target_part; ?>
-                                        <?php if ($lunas): ?>
-                                        <a href="<?= base_url('owner/participant/receipt/' . $part['id']) ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cetak Kwitansi Lunas"><i class="bi bi-printer"></i></a>
-                                        <?php endif; ?>
+                                        <a href="<?= base_url('owner/participant/receipt/' . $part['id']) ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cetak kwitansi ringkasan pembayaran"><i class="bi bi-printer"></i></a>
                                         <a href="<?= base_url('owner/participant/registration-form/' . $part['id']) ?>" target="_blank" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cetak Formulir Pendaftaran"><i class="bi bi-file-earmark-text"></i></a>
                                         <a href="<?= base_url('owner/participant/documents/' . $part['id']) ?>" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" title="Lihat Berkas"><i class="bi bi-file-earmark-check"></i></a>
                                     </div>
@@ -170,6 +167,20 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body py-4">
+                <div class="row g-2 mb-3" id="historySummary">
+                    <div class="col-12 col-md-6">
+                        <div class="bg-success-soft rounded-3 px-3 py-2">
+                            <div class="small text-secondary">Total Sudah Dibayar</div>
+                            <div class="fw-bold text-success" id="historyTotalPaid">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="bg-danger-soft rounded-3 px-3 py-2">
+                            <div class="small text-secondary">Total Kekurangan Bayar</div>
+                            <div class="fw-bold text-danger" id="historyRemaining">Rp 0</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="bg-light">
@@ -200,6 +211,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const historyModal = new bootstrap.Modal(document.getElementById('historyModal'));
     const historyContent = document.getElementById('historyContent');
     const historyParticipantName = document.getElementById('historyParticipantName');
+    const historyTotalPaid = document.getElementById('historyTotalPaid');
+    const historyRemaining = document.getElementById('historyRemaining');
+
+    function formatRupiah(value) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
+    }
 
     document.querySelectorAll('.btn-history').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -207,6 +224,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = this.getAttribute('data-name');
             
             historyParticipantName.innerText = name;
+            historyTotalPaid.innerText = 'Memuat...';
+            historyRemaining.innerText = 'Memuat...';
             historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary me-2"></div> Memuat data...</td></tr>';
             historyModal.show();
 
@@ -214,6 +233,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(res => {
                     if (res.status === 'success') {
+                        historyTotalPaid.innerText = formatRupiah(res.summary?.total_paid || 0);
+                        historyRemaining.innerText = formatRupiah(res.summary?.remaining || 0);
                         if (res.data.length === 0) {
                             historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Belum ada riwayat pembayaran.</td></tr>';
                         } else {
@@ -247,10 +268,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             historyContent.innerHTML = html;
                         }
                     } else {
+                        historyTotalPaid.innerText = '-';
+                        historyRemaining.innerText = '-';
                         historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Gagal memuat data.</td></tr>';
                     }
                 })
                 .catch(err => {
+                    historyTotalPaid.innerText = '-';
+                    historyRemaining.innerText = '-';
                     historyContent.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Terjadi kesalahan sistem.</td></tr>';
                 });
         });

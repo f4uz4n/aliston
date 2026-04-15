@@ -117,11 +117,9 @@
                                     <a href="<?= base_url('agency/payment-detail/'.$p['id']) ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3" title="Laporan Pembayaran">
                                         <i class="bi bi-wallet2 me-1"></i> Laporan Pembayaran
                                     </a>
-                                    <?php if (!empty($p['pembayaran_lunas'])): ?>
-                                        <a href="<?= base_url('agency/receipt/'.$p['id']) ?>" target="_blank" class="btn btn-sm btn-success rounded-pill px-3" title="Cetak Pembayaran Lunas">
-                                            <i class="bi bi-printer-fill me-1"></i> Cetak Pembayaran
-                                        </a>
-                                    <?php endif; ?>
+                                    <a href="<?= base_url('agency/receipt/'.$p['id']) ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3" title="Cetak kwitansi ringkasan pembayaran">
+                                        <i class="bi bi-printer-fill me-1"></i> Cetak Kwitansi
+                                    </a>
                                     <a href="<?= base_url('agency/registration-form/'.$p['id']) ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                         <i class="bi bi-printer me-1"></i> Cetak Formulir
                                     </a>

@@ -151,11 +151,9 @@ $boardingFromCustomNote = ! empty($participant['departure_note']) && preg_match(
                                 <?php if (is_owner()): ?>
                                 <a href="<?= base_url('owner/payment-verification?participant_id=' . (int)$participant['id'] . '&tab=pending') ?>" class="btn btn-outline-primary btn-sm rounded-pill">Verifikasi Pembayaran</a>
                                 <?php endif; ?>
-                                <?php if ($pembayaranLunas && $totalTargetKelola > 0): ?>
                                 <a href="<?= base_url('owner/participant/receipt/' . (int)$participant['id']) ?>" target="_blank" class="btn btn-outline-success btn-sm rounded-pill">
-                                    <i class="bi bi-printer me-1"></i> Cetak Kwitansi Lunas
+                                    <i class="bi bi-printer me-1"></i> Cetak Kwitansi
                                 </a>
-                                <?php endif; ?>
                                 <?php if (!empty($verifiedPayments)): ?>
                                 <div class="text-end mt-1 pt-1 border-top w-100">
                                     <span class="small text-secondary d-block mb-1">Kwitansi per setoran (sudah diverifikasi pemilik)</span>

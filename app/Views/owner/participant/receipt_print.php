@@ -107,7 +107,17 @@
 </div>
 
 <div class="receipt-container print-sheet">
+    <?php
+    $total_target_receipt = (float) ($participant['package_price'] ?? 0) + (float) ($participant['upgrade_cost'] ?? 0);
+    $total_paid_sum = 0.0;
+    foreach ($payments ?? [] as $_pay) {
+        $total_paid_sum += (float) ($_pay['amount'] ?? 0);
+    }
+    $is_kwitansi_lunas = $total_target_receipt > 0 && $total_paid_sum >= $total_target_receipt;
+    ?>
+    <?php if ($is_kwitansi_lunas): ?>
     <div class="watermark">LUNAS</div>
+    <?php endif; ?>
     
     <div class="receipt-header">
         <div class="row align-items-center">
@@ -130,7 +140,6 @@
         <div class="col-4">
             <div class="info-label">Paket Perjalanan</div>
             <div class="info-value"><?= esc($participant['package_name']) ?></div>
-            <?php $total_target_receipt = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0); ?>
             <div class="small text-secondary">Total: Rp <?= number_format($total_target_receipt, 0, ',', '.') ?><?= (!empty($participant['upgrade_cost']) && (float)$participant['upgrade_cost'] > 0) ? ' <span class="text-muted">(Paket + Upgrade)</span>' : '' ?></div>
         </div>
         <div class="col-4 text-end">
@@ -176,10 +185,8 @@
                         <td><span class="badge bg-primary me-2">TAHAP INI</span> <?= esc($payment['notes'] ?: 'Pembayaran Angsuran') ?></td>
                         <td class="text-end fw-bold">Rp <?= number_format($payment['amount'], 0, ',', '.') ?></td>
                     </tr>
-                <?php else: 
-                    $total_paid = 0;
-                    foreach($payments as $pay): 
-                        $total_paid += $pay['amount'];
+                <?php else:
+                    foreach ($payments as $pay):
                     ?>
                     <tr>
                         <td><?= date('d/m/Y', strtotime($pay['payment_date'])) ?></td>
@@ -202,12 +209,12 @@
         <div class="row align-items-center text-uppercase">
             <div class="col-6">
                 <h6 class="fw-800 text-secondary mb-0" style="font-size: 0.7rem;">Total Terbayar</h6>
-                <h2 class="fw-800 text-dark mb-0">Rp <?= number_format($total_paid, 0, ',', '.') ?></h2>
+                <h2 class="fw-800 text-dark mb-0">Rp <?= number_format($total_paid_sum, 0, ',', '.') ?></h2>
             </div>
             <div class="col-6 text-end border-start">
                 <h6 class="fw-800 text-secondary mb-0" style="font-size: 0.7rem;">Sisa Tagihan</h6>
-                <h4 class="fw-800 <?= (($total_target_receipt ?? (($participant['package_price'] ?? 0) + ($participant['upgrade_cost'] ?? 0))) - $total_paid > 0) ? 'text-danger' : 'text-success' ?> mb-0">
-                    Rp <?= number_format(max(0, ($total_target_receipt ?? (($participant['package_price'] ?? 0) + ($participant['upgrade_cost'] ?? 0))) - $total_paid), 0, ',', '.') ?>
+                <h4 class="fw-800 <?= ($total_target_receipt - $total_paid_sum > 0) ? 'text-danger' : 'text-success' ?> mb-0">
+                    Rp <?= number_format(max(0, $total_target_receipt - $total_paid_sum), 0, ',', '.') ?>
                 </h4>
             </div>
         </div>
@@ -253,7 +260,7 @@
             var name = <?= json_encode(isset($participant['name']) ? preg_replace('/[^a-z0-9 _-]/i', '-', $participant['name']) : 'kwitansi') ?>;
             var opt = {
                 margin: [4, 6, 6, 6],
-                filename: 'Kwitansi-Lunas-' + name + '.pdf',
+                filename: 'Kwitansi-' + name + '.pdf',
                 image: { type: 'jpeg', quality: 0.96 },
                 html2canvas: {
                     scale: 2,
