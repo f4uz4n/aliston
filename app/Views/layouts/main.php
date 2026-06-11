@@ -471,7 +471,7 @@ helper('branding'); ?>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('owner/tabungan') ?>" class="nav-link <?= strpos(current_url(), 'owner/tabungan') !== false ? 'active' : '' ?>">
+                            <a href="<?= base_url('owner/tabungan') ?>" class="nav-link <?= (strpos(current_url(), 'owner/tabungan') !== false && strpos(current_url(), 'owner/tabungan/report') === false) ? 'active' : '' ?>">
                                 <i class="bi bi-safe2"></i>
                                 <span>Tabungan Jamaah</span>
                             </a>
@@ -572,6 +572,12 @@ helper('branding'); ?>
                             <a href="<?= base_url('owner/reports') ?>" class="nav-link <?= strpos(current_url(), 'reports') !== false ? 'active' : '' ?>">
                                 <i class="bi bi-graph-up-arrow"></i>
                                 <span>Laporan Bisnis</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?= base_url('owner/tabungan/report') ?>" class="nav-link <?= strpos(current_url(), 'owner/tabungan/report') !== false ? 'active' : '' ?>">
+                                <i class="bi bi-safe2"></i>
+                                <span>Laporan Tabungan</span>
                             </a>
                         </li>
                         <li class="nav-item">

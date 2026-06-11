@@ -189,6 +189,8 @@ $routes->group('owner', ['filter' => 'auth:owner'], function ($routes) {
     $routes->get('reports', 'Reports::index');
     $routes->get('reports/equipment', 'Reports::equipment');
     $routes->get('reports/registrations-export', 'Reports::registrationsExport');
+    $routes->get('reports/payment-detail-export/(:num)', 'Reports::paymentDetailExport/$1');
+    $routes->get('tabungan/report', 'Tabungan::report');
 });
 
 $routes->group('package', ['filter' => 'auth:owner,office_admin'], function ($routes) {

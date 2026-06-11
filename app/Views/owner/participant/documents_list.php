@@ -4,7 +4,10 @@
 <div class="row align-items-center mb-5">
     <div class="col-12 col-md-6">
         <h2 class="fw-800 text-dark mb-1">Kelengkapan Berkas</h2>
-        <p class="text-secondary">Verifikasi dokumen persyaratan calon jamaah</p>
+        <p class="text-secondary mb-0">Verifikasi dokumen persyaratan calon jamaah</p>
+        <?php if (($total ?? 0) > 0): ?>
+            <small class="text-muted">Menampilkan <?= count($participants) ?> dari <?= (int) $total ?> jamaah</small>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -54,7 +57,8 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4 py-3 border-0 text-secondary small fw-bold text-uppercase">Nama Jamaah</th>
+                            <th class="ps-4 py-3 border-0 text-secondary small fw-bold text-uppercase" width="60">No</th>
+                            <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Nama Jamaah</th>
                             <th class="py-3 border-0 text-secondary small fw-bold text-uppercase">Persentase Berkas</th>
                             <th class="py-3 border-0 text-secondary small fw-bold text-uppercase text-center">Status Verifikasi</th>
                             <th class="pe-4 py-3 border-0 text-secondary small fw-bold text-uppercase text-end">Aksi</th>
@@ -63,7 +67,7 @@
                     <tbody>
                         <?php if(empty($participants)): ?>
                             <tr>
-                                <td colspan="4" class="text-center py-5">
+                                <td colspan="5" class="text-center py-5">
                                     <div class="py-4">
                                         <i class="bi bi-file-earmark-text text-muted fs-1 mb-3"></i>
                                         <p class="text-secondary mb-0">Belum ada jamaah atau data tidak ditemukan.</p>
@@ -71,9 +75,10 @@
                                 </td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach($participants as $part): ?>
+                            <?php foreach($participants as $i => $part): ?>
                             <tr>
-                                <td class="ps-4">
+                                <td class="ps-4 text-secondary fw-bold"><?= ($start_number ?? 0) + $i + 1 ?></td>
+                                <td>
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle bg-info-soft text-info p-2 me-3 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
                                             <i class="bi bi-person"></i>
@@ -111,6 +116,11 @@
                     </tbody>
                 </table>
             </div>
+            <?php if (!empty($pager)): ?>
+                <div class="card-footer bg-white border-0 py-3 px-4">
+                    <?= $pager->links() ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

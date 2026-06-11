@@ -75,7 +75,7 @@
 
 <!-- Stats Cards -->
 <div class="row g-4 mb-5">
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-6 col-xl">
         <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-3">
@@ -91,7 +91,7 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-6 col-xl">
         <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-3">
@@ -104,7 +104,7 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-6 col-xl">
         <div class="card border-0 shadow-sm rounded-4 h-100 bg-white border-bottom border-4 border-warning">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-3">
@@ -117,7 +117,20 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-6 col-xl">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-white border-bottom border-4 border-danger">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="bg-danger-soft text-danger rounded-circle p-2">
+                        <i class="bi bi-x-circle fs-4"></i>
+                    </div>
+                </div>
+                <h6 class="text-secondary small fw-bold text-uppercase ls-1 mb-1">Jamaah Batal</h6>
+                <h2 class="fw-800 mb-0 text-danger"><?= $stats['cancelled_jamaah'] ?? 0 ?></h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl">
         <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-3">
@@ -222,7 +235,11 @@
                                     </td>
                                     <td class="text-center">
                                         <?php 
-                                            $badge = $reg['status'] == 'verified' ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning';
+                                            $badge = match ($reg['status']) {
+                                                'verified' => 'bg-success-soft text-success',
+                                                'cancelled' => 'bg-danger-soft text-danger',
+                                                default => 'bg-warning-soft text-warning',
+                                            };
                                         ?>
                                         <span class="badge <?= $badge ?> rounded-pill px-3 py-1 fw-bold"><?= strtoupper($reg['status']) ?></span>
                                     </td>

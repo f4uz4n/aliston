@@ -19,7 +19,7 @@ class App extends BaseConfig
      * Production: wajib setel di .env, contoh: app.baseURL = 'https://domain-anda.com/'
      * (tanpa ini, helper URL bisa error di PHP 8.1+).
      */
-    public string $baseURL = 'http://localhost:8080/';
+    public string $baseURL = 'https://alistonkediri.co.id/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.

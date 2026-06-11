@@ -104,6 +104,9 @@ class Participant extends BaseController
             if (!$participant) {
                 return redirect()->to('owner/participant/documents')->with('error', 'Jamaah tidak ditemukan.');
             }
+            if ($participant['status'] === 'cancelled') {
+                return redirect()->to('owner/participant/documents')->with('error', 'Jamaah yang dibatalkan tidak ditampilkan di kelengkapan berkas.');
+            }
 
             $stats = $this->getDocStats($id);
 
@@ -121,6 +124,7 @@ class Participant extends BaseController
         $status = $this->request->getGet('status');
 
         $builder = $this->participantModel->getParticipantBuilder();
+        $builder->where('participants.status !=', 'cancelled'); // Jamaah batal hanya tampil di menu Pembatalan
 
         if ($search) {
             $builder->groupStart()
@@ -157,10 +161,23 @@ class Participant extends BaseController
             }
         }
 
+        $perPage = 20;
+        $page = max(1, (int) ($this->request->getGet('page') ?? 1));
+        $total = count($filteredParticipants);
+        $offset = ($page - 1) * $perPage;
+        $pagedParticipants = array_slice($filteredParticipants, $offset, $perPage);
+
+        $pager = \Config\Services::pager();
+        $pager->only(['search', 'status']);
+        $pager->store('default', $page, $perPage, $total);
+
         $data = [
-            'participants' => $filteredParticipants,
+            'participants' => $pagedParticipants,
             'search' => $search,
-            'status' => $status
+            'status' => $status,
+            'pager' => $pager,
+            'start_number' => $offset,
+            'total' => $total,
         ];
         return view('owner/participant/documents_list', $data);
     }

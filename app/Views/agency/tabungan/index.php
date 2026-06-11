@@ -41,6 +41,7 @@
                         <tr>
                             <th class="ps-4 py-3 text-secondary small fw-bold text-uppercase">Nama</th>
                             <th class="py-3 text-secondary small fw-bold text-uppercase">NIK</th>
+                            <th class="py-3 text-secondary small fw-bold text-uppercase">Tipe</th>
                             <th class="py-3 text-secondary small fw-bold text-uppercase">Tanggal Daftar</th>
                             <th class="py-3 text-secondary small fw-bold text-uppercase text-end">Saldo</th>
                             <th class="py-3 text-secondary small fw-bold text-uppercase">Status</th>
@@ -49,12 +50,19 @@
                     </thead>
                     <tbody>
                         <?php if (empty($savings)): ?>
-                        <tr><td colspan="6" class="text-center py-5"><i class="bi bi-safe2 text-muted fs-1 d-block mb-3"></i><p class="text-secondary mb-0">Belum ada data tabungan.</p></td></tr>
+                        <tr><td colspan="7" class="text-center py-5"><i class="bi bi-safe2 text-muted fs-1 d-block mb-3"></i><p class="text-secondary mb-0">Belum ada data tabungan.</p></td></tr>
                         <?php else: ?>
                         <?php foreach ($savings as $s): ?>
                         <tr>
                             <td class="ps-4 fw-bold"><?= esc($s['name']) ?></td>
                             <td><?= esc($s['nik']) ?></td>
+                            <td>
+                                <?php if (($s['registration_type'] ?? 'mandiri') === 'mou'): ?>
+                                <span class="badge bg-primary-soft text-primary rounded-pill px-3">MOU</span>
+                                <?php else: ?>
+                                <span class="badge bg-success-soft text-success rounded-pill px-3">MANDIRI</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="small"><?= !empty($s['created_at']) ? date('d M Y', strtotime($s['created_at'])) : '—' ?></td>
                             <td class="text-end fw-bold">Rp <?= number_format($s['total_balance'], 0, ',', '.') ?></td>
                             <td>

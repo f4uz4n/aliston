@@ -11,6 +11,9 @@
         <?php endif; ?>
         <h2 class="fw-800 text-dark mb-1">Verifikasi Pembayaran</h2>
         <p class="text-secondary mb-0">Kelola konfirmasi pembayaran dari Agency & Jamaah</p>
+        <?php if (($total ?? 0) > 0): ?>
+            <small class="text-muted">Menampilkan <?= count($payments) ?> dari <?= (int) $total ?> pembayaran</small>
+        <?php endif; ?>
         <?php if (!empty($nama_sekretaris_bendahara)): ?>
         <p class="text-muted small mb-0 mt-1"><i class="bi bi-person-badge me-1"></i> Sekretaris/Bendahara: <strong><?= esc($nama_sekretaris_bendahara) ?></strong></p>
         <?php endif; ?>
@@ -18,29 +21,56 @@
 </div>
 
 <?php
-$participant_id_q = !empty($filters['participant_id']) ? 'participant_id=' . (int)$filters['participant_id'] : '';
-$url_pending = base_url('owner/payment-verification') . ($participant_id_q ? '?' . $participant_id_q : '');
-$url_history = base_url('owner/payment-verification?tab=history') . ($participant_id_q ? '&' . $participant_id_q : '');
+$historyScope = $history_scope ?? 'active';
+$filterQuery = array_filter([
+    'participant_id' => $filters['participant_id'] ?? '',
+    'search' => $filters['search'] ?? '',
+    'start_date' => $filters['start_date'] ?? '',
+    'end_date' => $filters['end_date'] ?? '',
+]);
+$url_pending = base_url('owner/payment-verification') . (empty($filterQuery) ? '' : '?' . http_build_query($filterQuery));
+$url_history_active = base_url('owner/payment-verification') . '?' . http_build_query(array_merge($filterQuery, ['tab' => 'history', 'history_scope' => 'active']));
+$url_history_cancelled = base_url('owner/payment-verification') . '?' . http_build_query(array_merge($filterQuery, ['tab' => 'history', 'history_scope' => 'cancelled']));
 ?>
 <!-- Tabs: Perlu Verifikasi aktif saat buka dari menu -->
 <div class="mb-4">
     <ul class="nav nav-pills bg-white p-1 rounded-pill shadow-sm d-inline-flex" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
-            <a href="<?= $url_pending ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'pending') ? 'active fw-bold' : 'text-secondary' ?>">
+            <a href="<?= esc($url_pending) ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'pending') ? 'active fw-bold' : 'text-secondary' ?>">
                 <i class="bi bi-clock-history me-2"></i> Perlu Verifikasi
             </a>
         </li>
         <li class="nav-item" role="presentation">
-            <a href="<?= $url_history ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'history') ? 'active fw-bold' : 'text-secondary' ?>">
+            <a href="<?= esc($url_history_active) ?>" class="nav-link rounded-pill px-4 <?= ($active_tab === 'history') ? 'active fw-bold' : 'text-secondary' ?>">
                 <i class="bi bi-archive me-2"></i> Riwayat
             </a>
         </li>
     </ul>
 </div>
 
+<?php if ($active_tab === 'history'): ?>
+<div class="mb-4">
+    <ul class="nav nav-pills bg-light p-1 rounded-pill d-inline-flex" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a href="<?= esc($url_history_active) ?>" class="nav-link rounded-pill px-4 <?= $historyScope === 'active' ? 'active fw-bold' : 'text-secondary' ?>">
+                <i class="bi bi-person-check me-2"></i> Jamaah Aktif
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a href="<?= esc($url_history_cancelled) ?>" class="nav-link rounded-pill px-4 <?= $historyScope === 'cancelled' ? 'active fw-bold' : 'text-secondary' ?>">
+                <i class="bi bi-person-x me-2"></i> Jamaah Batal
+            </a>
+        </li>
+    </ul>
+</div>
+<?php endif; ?>
+
 <!-- Filter Form -->
 <form action="" method="get" class="card border-0 shadow-sm p-3 mb-4 rounded-4 bg-white">
     <input type="hidden" name="tab" value="<?= esc($active_tab) ?>">
+    <?php if ($active_tab === 'history'): ?>
+        <input type="hidden" name="history_scope" value="<?= esc($historyScope) ?>">
+    <?php endif; ?>
     <div class="row g-3">
         <div class="col-md-3">
             <div class="input-group">
@@ -74,7 +104,13 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
         <div class="col-md-2 d-flex gap-2">
             <button type="submit" class="btn btn-primary flex-grow-1 rounded-pill fw-bold">Filter</button>
             <?php if(($filters['search'] ?? '') || ($filters['start_date'] ?? '') || ($filters['end_date'] ?? '') || ($filters['participant_id'] ?? '') !== ''): ?>
-                <a href="<?= base_url('owner/payment-verification?tab=' . $active_tab) ?>" class="btn btn-light rounded-pill border" data-bs-toggle="tooltip" title="Reset Filter"><i class="bi bi-x-lg"></i></a>
+                <?php
+                $resetQuery = ['tab' => $active_tab];
+                if ($active_tab === 'history') {
+                    $resetQuery['history_scope'] = $historyScope;
+                }
+                ?>
+                <a href="<?= base_url('owner/payment-verification?' . http_build_query($resetQuery)) ?>" class="btn btn-light rounded-pill border" data-bs-toggle="tooltip" title="Reset Filter"><i class="bi bi-x-lg"></i></a>
             <?php endif; ?>
         </div>
     </div>
@@ -86,7 +122,8 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4 py-3 text-secondary small text-uppercase">Detail Jamaah</th>
+                        <th class="ps-4 py-3 text-secondary small text-uppercase" width="60">No</th>
+                        <th class="py-3 text-secondary small text-uppercase">Detail Jamaah</th>
                         <th class="py-3 text-secondary small text-uppercase" width="30%">Progress Pembayaran</th>
                         <th class="py-3 text-secondary small text-uppercase">Nominal Bayar</th>
                         <th class="py-3 text-secondary small text-uppercase">Bukti</th>
@@ -96,27 +133,35 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
                 <tbody>
                     <?php if(empty($payments)): ?>
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
+                            <td colspan="6" class="text-center py-5 text-muted">
                                 <div class="py-3">
                                     <?php if($active_tab === 'pending'): ?>
                                         <i class="bi bi-check-circle-fill text-success opacity-25 display-3 d-block mb-2"></i>
                                         <h6 class="text-secondary">Tidak ada data ditemukan</h6>
                                         <p class="small mb-0">Cobalah mengubah filter pencarian atau belum ada pembayaran baru.</p>
+                                    <?php elseif ($historyScope === 'cancelled'): ?>
+                                        <i class="bi bi-person-x text-secondary opacity-25 display-3 d-block mb-2"></i>
+                                        <h6 class="text-secondary">Tidak ada riwayat pembayaran jamaah batal</h6>
+                                        <p class="small mb-0">Cobalah mengubah filter pencarian anda.</p>
                                     <?php else: ?>
                                         <i class="bi bi-archive text-secondary opacity-25 display-3 d-block mb-2"></i>
-                                        <h6 class="text-secondary">Tidak ada riwayat ditemukan</h6>
+                                        <h6 class="text-secondary">Tidak ada riwayat pembayaran jamaah aktif</h6>
                                         <p class="small mb-0">Cobalah mengubah filter pencarian anda.</p>
                                     <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
                     <?php else: ?>
-                        <?php foreach($payments as $p): ?>
+                        <?php foreach($payments as $i => $p): ?>
                         <tr>
-                            <td class="ps-4">
-                                <div class="d-flex align-items-center mb-1">
+                            <td class="ps-4 text-secondary fw-bold"><?= ($start_number ?? 0) + $i + 1 ?></td>
+                            <td>
+                                <div class="d-flex align-items-center mb-1 flex-wrap gap-1">
                                     <span class="fw-bold text-dark me-2"><?= esc(format_nama_jamaah($p['participant_name'] ?? '')) ?></span>
                                     <span class="badge bg-light text-secondary border"><?= esc($p['participant_nik']) ?></span>
+                                    <?php if (($p['participant_status'] ?? '') === 'cancelled'): ?>
+                                        <span class="badge bg-danger-soft text-danger rounded-pill px-2 py-1 small fw-bold">BATAL</span>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="small text-secondary mb-1">
                                     <i class="bi bi-building me-1"></i> <?= esc($p['agency_name']) ?>
@@ -209,6 +254,11 @@ $url_history = base_url('owner/payment-verification?tab=history') . ($participan
                 </tbody>
             </table>
         </div>
+        <?php if (!empty($pager)): ?>
+            <div class="card-footer bg-white border-0 py-3 px-4">
+                <?= $pager->links() ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

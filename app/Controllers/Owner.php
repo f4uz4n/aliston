@@ -40,13 +40,20 @@ class Owner extends BaseController
             'total_packages' => $packageModel->countAllResults(),
             'verified_jamaah' => 0,
             'pending_jamaah' => 0,
+            'cancelled_jamaah' => 0,
         ];
 
         foreach ($registrations as $reg) {
-            if ($reg['status'] == 'verified')
+            $isCancelled = (($reg['status'] ?? '') === 'cancelled') || !empty($reg['cancelled_at']);
+
+            if (($reg['status'] ?? '') === 'verified' && !$isCancelled) {
                 $stats['verified_jamaah']++;
-            else
+            } elseif ($isCancelled) {
+                // Jika sudah ada catatan pembatalan, jangan dihitung sebagai menunggu.
+                $stats['cancelled_jamaah']++;
+            } else {
                 $stats['pending_jamaah']++;
+            }
         }
 
         // 2. Chart Data: Trends (Last 30 Days if no date filter, otherwise filtered)
@@ -277,12 +284,16 @@ class Owner extends BaseController
 
         // Tab default: Perlu Verifikasi (pending)
         $tab = $this->request->getGet('tab') ?? 'pending';
+        $historyScope = $this->request->getGet('history_scope') ?? 'active';
+        if (! in_array($historyScope, ['active', 'cancelled'], true)) {
+            $historyScope = 'active';
+        }
         $search = $this->request->getGet('search');
         $participantId = $this->request->getGet('participant_id');
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
 
-        $builder = $paymentModel->select('participant_payments.*, participants.name as participant_name, participants.nik as participant_nik, participants.upgrade_cost, users.full_name as agency_name, travel_packages.name as package_name, travel_packages.price as package_price')
+        $builder = $paymentModel->select('participant_payments.*, participants.name as participant_name, participants.nik as participant_nik, participants.status as participant_status, participants.upgrade_cost, users.full_name as agency_name, travel_packages.name as package_name, travel_packages.price as package_price')
             ->join('participants', 'participants.id = participant_payments.participant_id')
             ->join('users', 'users.id = participants.agency_id')
             ->join('travel_packages', 'travel_packages.id = participants.package_id');
@@ -311,14 +322,25 @@ class Owner extends BaseController
         }
 
         if ($tab === 'history') {
+            if ($historyScope === 'cancelled') {
+                $builder->where('participants.status', 'cancelled');
+            } else {
+                $builder->where('participants.status !=', 'cancelled');
+            }
             $builder->whereIn('participant_payments.status', ['verified', 'rejected']);
             $builder->orderBy('participant_payments.updated_at', 'DESC');
         } else {
             $builder->where('participant_payments.status', 'pending');
+            $builder->where('participants.status !=', 'cancelled');
             $builder->orderBy('participant_payments.created_at', 'ASC');
         }
 
-        $payments = $builder->findAll();
+        $perPage = 20;
+        $pager = \Config\Services::pager();
+        $pager->only(['tab', 'history_scope', 'search', 'participant_id', 'start_date', 'end_date']);
+        $payments = $builder->paginate($perPage);
+        $pager = $paymentModel->pager;
+        $startNumber = ($pager->getCurrentPage() - 1) * $pager->getPerPage();
 
         // Enrich data with payment progress (total = harga paket + upgrade)
         foreach ($payments as &$p) {
@@ -350,8 +372,12 @@ class Owner extends BaseController
         $data = [
             'payments' => $payments,
             'active_tab' => $tab,
+            'history_scope' => $historyScope,
             'participants_list' => $participantsList,
             'nama_sekretaris_bendahara' => $owner['nama_sekretaris_bendahara'] ?? '',
+            'pager' => $pager,
+            'start_number' => $startNumber,
+            'total' => $pager->getTotal(),
             'filters' => [
                 'search' => $search,
                 'participant_id' => $participantId,

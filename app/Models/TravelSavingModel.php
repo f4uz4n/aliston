@@ -10,7 +10,10 @@ class TravelSavingModel extends Model
     protected $primaryKey = 'id';
     protected $allowedFields = [
         'agency_id', 'name', 'nik', 'phone', 'total_balance', 'status',
-        'package_id', 'participant_id', 'claimed_at', 'notes'
+        'package_id', 'participant_id', 'claimed_at', 'notes',
+        'registration_type', 'ktp_file', 'mou_file',
+        'institution_name', 'institution_address', 'institution_pic_name', 'institution_phone',
+        'group_ref'
     ];
     protected $useTimestamps = true;
     protected $dateFormat = 'datetime';

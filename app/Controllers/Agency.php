@@ -222,28 +222,150 @@ class Agency extends BaseController
      */
     public function tabunganStore()
     {
+        $savingModel = new \App\Models\TravelSavingModel();
+        $registrationType = (string) ($this->request->getPost('registration_type') ?: 'mandiri');
+        if (!in_array($registrationType, ['mandiri', 'mou'], true)) {
+            $registrationType = 'mandiri';
+        }
+
         $rules = [
-            'name' => 'required|min_length[3]',
-            'nik' => 'required|min_length[16]|max_length[20]',
-            'phone' => 'permit_empty',
+            'registration_type' => 'required|in_list[mandiri,mou]',
+            'notes' => 'permit_empty',
         ];
+
+        if ($registrationType === 'mou') {
+            $rules['institution_name'] = 'required|min_length[3]';
+            $rules['institution_address'] = 'required|min_length[5]';
+            $rules['institution_pic_name'] = 'required|min_length[3]';
+            $rules['institution_phone'] = 'required|min_length[8]|max_length[20]';
+            $rules['mou_file'] = 'uploaded[mou_file]|max_size[mou_file,5120]|mime_in[mou_file,image/jpeg,image/png,image/webp,application/pdf]';
+            $rules['names.*'] = 'required|min_length[3]';
+            $rules['niks.*'] = 'required|min_length[16]|max_length[20]';
+            $rules['phones.*'] = 'permit_empty|max_length[20]';
+        } else {
+            $rules['name'] = 'required|min_length[3]';
+            $rules['nik'] = 'required|min_length[16]|max_length[20]';
+            $rules['phone'] = 'permit_empty|max_length[20]';
+            $rules['ktp_file'] = 'uploaded[ktp_file]|max_size[ktp_file,5120]|mime_in[ktp_file,image/jpeg,image/png,image/webp,application/pdf]';
+        }
+
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
-        $savingModel = new \App\Models\TravelSavingModel();
-        $data = [
-            'agency_id' => session()->get('id'),
-            'name' => $this->request->getPost('name'),
-            'nik' => $this->request->getPost('nik'),
-            'phone' => $this->request->getPost('phone') ?: null,
-            'total_balance' => 0,
-            'status' => 'menabung',
-            'notes' => $this->request->getPost('notes') ?: null,
-        ];
-        if ($savingModel->insert($data)) {
-            return redirect()->to('agency/tabungan')->with('msg', 'Jamaah tabungan berhasil didaftarkan.');
+
+        $uploadDir = FCPATH . 'uploads/tabungan';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
-        return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data.');
+
+        $ktpFilePath = null;
+        if ($registrationType === 'mandiri') {
+            $ktpFile = $this->request->getFile('ktp_file');
+            if ($ktpFile && $ktpFile->isValid() && !$ktpFile->hasMoved()) {
+                $ktpName = $ktpFile->getRandomName();
+                $ktpFile->move($uploadDir, $ktpName);
+                $ktpFilePath = 'uploads/tabungan/' . $ktpName;
+            }
+        }
+
+        $mouFilePath = null;
+        if ($registrationType === 'mou') {
+            $mouFile = $this->request->getFile('mou_file');
+            if ($mouFile && $mouFile->isValid() && !$mouFile->hasMoved()) {
+                $mouName = $mouFile->getRandomName();
+                $mouFile->move($uploadDir, $mouName);
+                $mouFilePath = 'uploads/tabungan/' . $mouName;
+            }
+        }
+
+        $institutionName = $registrationType === 'mou' ? (string) $this->request->getPost('institution_name') : null;
+        $institutionAddress = $registrationType === 'mou' ? (string) $this->request->getPost('institution_address') : null;
+        $institutionPicName = $registrationType === 'mou' ? (string) $this->request->getPost('institution_pic_name') : null;
+        $institutionPhone = $registrationType === 'mou' ? (string) $this->request->getPost('institution_phone') : null;
+        $groupRef = $registrationType === 'mou' ? ('MOU-' . date('YmdHis') . '-' . mt_rand(100, 999)) : null;
+
+        $records = [];
+        if ($registrationType === 'mou') {
+            $names = (array) $this->request->getPost('names');
+            $niks = (array) $this->request->getPost('niks');
+            $phones = (array) $this->request->getPost('phones');
+            $ktpFiles = $this->request->getFiles()['ktp_files'] ?? [];
+            foreach ($names as $i => $nm) {
+                $name = trim((string) $nm);
+                $nik = trim((string) ($niks[$i] ?? ''));
+                $phone = trim((string) ($phones[$i] ?? ''));
+                if ($name === '' || $nik === '') {
+                    continue;
+                }
+
+                $rowKtpPath = null;
+                $rowKtpFile = $ktpFiles[$i] ?? null;
+                if (! $rowKtpFile || ! $rowKtpFile->isValid() || $rowKtpFile->hasMoved()) {
+                    return redirect()->back()->withInput()->with('error', 'Setiap jamaah MOU wajib upload KTP yang valid.');
+                }
+                if ($rowKtpFile->getSizeByUnit('kb') > 5120) {
+                    return redirect()->back()->withInput()->with('error', 'Ukuran file KTP maksimal 5MB per jamaah.');
+                }
+                $allowedMime = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+                if (!in_array($rowKtpFile->getClientMimeType(), $allowedMime, true)) {
+                    return redirect()->back()->withInput()->with('error', 'Format file KTP MOU harus JPG, PNG, WEBP, atau PDF.');
+                }
+                $rowKtpName = $rowKtpFile->getRandomName();
+                $rowKtpFile->move($uploadDir, $rowKtpName);
+                $rowKtpPath = 'uploads/tabungan/' . $rowKtpName;
+
+                $records[] = [
+                    'agency_id' => session()->get('id'),
+                    'name' => $name,
+                    'nik' => $nik,
+                    'phone' => $phone !== '' ? $phone : null,
+                    'total_balance' => 0,
+                    'status' => 'menabung',
+                    'notes' => $this->request->getPost('notes') ?: null,
+                    'registration_type' => 'mou',
+                    'ktp_file' => $rowKtpPath,
+                    'mou_file' => $mouFilePath,
+                    'institution_name' => $institutionName,
+                    'institution_address' => $institutionAddress,
+                    'institution_pic_name' => $institutionPicName,
+                    'institution_phone' => $institutionPhone,
+                    'group_ref' => $groupRef,
+                ];
+            }
+        } else {
+            $records[] = [
+                'agency_id' => session()->get('id'),
+                'name' => (string) $this->request->getPost('name'),
+                'nik' => (string) $this->request->getPost('nik'),
+                'phone' => $this->request->getPost('phone') ?: null,
+                'total_balance' => 0,
+                'status' => 'menabung',
+                'notes' => $this->request->getPost('notes') ?: null,
+                'registration_type' => 'mandiri',
+                'ktp_file' => $ktpFilePath,
+                'mou_file' => null,
+                'institution_name' => null,
+                'institution_address' => null,
+                'institution_pic_name' => null,
+                'institution_phone' => null,
+                'group_ref' => null,
+            ];
+        }
+
+        if (empty($records)) {
+            return redirect()->back()->withInput()->with('error', 'Data jamaah belum lengkap.');
+        }
+
+        foreach ($records as $record) {
+            if (!$savingModel->insert($record)) {
+                return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data jamaah tabungan.');
+            }
+        }
+
+        if ($registrationType === 'mou') {
+            return redirect()->to('agency/tabungan')->with('msg', count($records) . ' jamaah tabungan MOU berhasil didaftarkan.');
+        }
+        return redirect()->to('agency/tabungan')->with('msg', 'Jamaah tabungan mandiri berhasil didaftarkan.');
     }
 
     /**
