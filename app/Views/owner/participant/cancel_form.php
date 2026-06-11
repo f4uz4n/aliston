@@ -34,12 +34,6 @@
                 <strong class="text-primary">Rp <?= number_format($total_paid, 0, ',', '.') ?></strong>
             </div>
         </div>
-        <?php if ($days_until_departure !== null): ?>
-        <div class="alert alert-info border-0 rounded-3 mb-4">
-            <strong>H-<?= $days_until_departure ?></strong> sebelum keberangkatan. <?= esc($refund_note) ?>
-        </div>
-        <?php endif; ?>
-
         <form action="<?= base_url('owner/participant/store-cancellation') ?>" method="post">
             <?= csrf_field() ?>
             <input type="hidden" name="participant_id" value="<?= $participant['id'] ?>">

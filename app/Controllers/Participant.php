@@ -596,10 +596,7 @@ class Participant extends BaseController
 
         $departure = participant_effective_departure($participant['package_departure_date'] ?? null, $participant['departure_note'] ?? null);
         $daysUntilDeparture = participant_days_until_departure($departure);
-        $allow_ubah_jadwal_hotel = false;
-        if ($daysUntilDeparture !== null) {
-            $allow_ubah_jadwal_hotel = ($daysUntilDeparture >= 30) && ($participant['status'] !== 'cancelled');
-        }
+        $allow_ubah_jadwal_hotel = ($participant['status'] !== 'cancelled');
 
         $totalTarget = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0);
         $totalPaid = (float)($paid['amount'] ?? 0);
@@ -785,12 +782,8 @@ class Participant extends BaseController
         if (!$dep) {
             return ['allowed' => false, 'message' => 'Jadwal keberangkatan tidak ditemukan.'];
         }
-        $days = participant_days_until_departure($dep);
-        if ($days === null) {
+        if (participant_days_until_departure($dep) === null) {
             return ['allowed' => false, 'message' => 'Jadwal keberangkatan tidak valid.'];
-        }
-        if ($days < 30) {
-            return ['allowed' => false, 'message' => 'Perubahan jadwal/hotel/kamar hanya dapat dilakukan minimal H-30 sebelum keberangkatan. Saat ini H-' . abs($days) . '.'];
         }
         return ['allowed' => true];
     }
@@ -1261,7 +1254,7 @@ class Participant extends BaseController
     }
 
     /**
-     * Form pembatalan jamaah: nominal refund default (H-30 full, else kena biaya), admin bisa ubah.
+     * Form pembatalan jamaah: nominal refund default = total dibayar, admin bisa ubah.
      */
     public function cancelForm($id)
     {
@@ -1285,31 +1278,12 @@ class Participant extends BaseController
 
         $paymentModel = new PaymentModel();
         $totalPaid = ($paymentModel->getTotalPaid($id)['amount'] ?? 0);
-        $departure = $participant['package_departure_date'] ?? null;
-        $daysUntil = null;
-        if ($departure) {
-            $today = date('Y-m-d');
-            $dep = date('Y-m-d', strtotime($departure));
-            $daysUntil = (int) floor((strtotime($dep) - strtotime($today)) / 86400);
-        }
-
-        $totalTarget = (float)($participant['package_price'] ?? 0) + (float)($participant['upgrade_cost'] ?? 0);
-        $feePercent = 10;
-        if ($daysUntil !== null && $daysUntil >= 30) {
-            $defaultRefund = $totalPaid;
-            $refundNote = 'Refund penuh (pembatalan H-30 atau lebih).';
-        } else {
-            $fee = $totalTarget * ($feePercent / 100);
-            $defaultRefund = max(0, $totalPaid - $fee);
-            $refundNote = 'Pembatalan kurang dari H-30: dikenakan biaya ' . $feePercent . '% dari total paket (Rp ' . number_format($fee, 0, ',', '.') . '). Nominal refund default = total dibayar dikurangi biaya.';
-        }
+        $defaultRefund = $totalPaid;
 
         $data = [
             'participant' => $participant,
             'total_paid' => $totalPaid,
-            'days_until_departure' => $daysUntil,
             'default_refund' => $defaultRefund,
-            'refund_note' => $refundNote,
         ];
         return view('owner/participant/cancel_form', $data);
     }

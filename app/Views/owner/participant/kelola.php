@@ -84,13 +84,6 @@ $boardingFromCustomNote = ! empty($participant['departure_note']) && preg_match(
     </div>
 </div>
 
-<?php if (!$allow && $days !== null && !$isCancelled): ?>
-<div class="alert alert-warning border-0 rounded-4 mb-4">
-    <i class="bi bi-exclamation-triangle me-2"></i>
-    <strong>Batasan H-30:</strong> Perubahan jadwal berangkat dan hotel/kamar hanya dapat dilakukan minimal 30 hari sebelum keberangkatan. Saat ini <strong>H-<?= $days ?></strong>. Form di bawah dinonaktifkan.
-</div>
-<?php endif; ?>
-
 <div class="row g-4">
     <!-- Monitoring Berkas & Pembayaran -->
     <div class="col-12">
@@ -183,7 +176,7 @@ $boardingFromCustomNote = ! empty($participant['departure_note']) && preg_match(
             </div>
             <div class="card-body">
                 <p class="small text-secondary mb-2">Jadwal saat ini: <strong><?= esc($participant['package_name']) ?></strong> (<?= $participant['package_departure_date'] ? date('d/m/Y', strtotime($participant['package_departure_date'])) : '—' ?>)</p>
-                <p class="small text-dark mb-2">Untuk batas H-30, H-15, dan boarding dipakai: <strong><?= esc($boardingScheduleLabel) ?></strong><?php if ($boardingFromCustomNote): ?> <span class="text-muted">— mengikuti catatan tanggal di bawah, bukan tanggal paket.</span><?php endif; ?></p>
+                <p class="small text-dark mb-2">Untuk perhitungan H-15 dan boarding dipakai: <strong><?= esc($boardingScheduleLabel) ?></strong><?php if ($boardingFromCustomNote): ?> <span class="text-muted">— mengikuti catatan tanggal di bawah, bukan tanggal paket.</span><?php endif; ?></p>
                 <?php if (!empty($participant['departure_note'])): ?>
                 <p class="small text-dark mb-3 p-2 rounded-3 bg-light border border-dashed"><span class="text-secondary">Catatan tanggal berangkat:</span> <?= esc($departureNoteDisplayLabel) ?></p>
                 <?php else: ?>
@@ -211,7 +204,7 @@ $boardingFromCustomNote = ! empty($participant['departure_note']) && preg_match(
                     <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-check2 me-1"></i> Simpan Jadwal</button>
                 </form>
                 <?php else: ?>
-                <p class="text-muted small mb-0">Perubahan jadwal dinonaktifkan (batasan H-30 atau jamaah dibatalkan).</p>
+                <p class="text-muted small mb-0">Perubahan jadwal dinonaktifkan karena jamaah sudah dibatalkan.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -264,7 +257,7 @@ $boardingFromCustomNote = ! empty($participant['departure_note']) && preg_match(
                     <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-check2 me-1"></i> Simpan Hotel & Kamar</button>
                 </form>
                 <?php else: ?>
-                <p class="text-muted small mb-0">Perubahan hotel/kamar dinonaktifkan (batasan H-30 atau jamaah dibatalkan).</p>
+                <p class="text-muted small mb-0">Perubahan hotel/kamar dinonaktifkan karena jamaah sudah dibatalkan.</p>
                 <?php endif; ?>
             </div>
         </div>
